@@ -60,6 +60,7 @@ stages:
     displayName: Deploy
     pool:
       vmImage: $(vmImageName)
+    environment: 'aspnetrunrundevops.default'
     strategy:
       runOnce:
         deploy:
