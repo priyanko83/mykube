@@ -6,7 +6,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
-COPY ["Shopping.Client/Shopping.Client.csproj", "Shopping.Client/"]
+COPY ["Create-AKS-NodePools-using-Terraform/src/Shopping.Client/Shopping.Client.csproj", "Shopping.Client/"]
 RUN dotnet restore "Shopping.Client/Shopping.Client.csproj"
 COPY . .
 WORKDIR "/src/Shopping.Client"
