@@ -35,5 +35,8 @@ stages:
         repository: $(imageRepository)
         dockerfile: $(dockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
+        buildContext: $(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src/Shopping
         tags: |
           $(tag)
+    - upload: aks
+      artifact: aks
