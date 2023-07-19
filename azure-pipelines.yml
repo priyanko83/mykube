@@ -41,6 +41,9 @@ stages:
     - upload: Create-AKS-NodePools-using-Terraform/deploy/aks
       artifact: Create-AKS-NodePools-using-Terraform/deploy/aks
 
+- stage: Deploy
+  displayName: Deploy stage
+  dependsOn: Build  
   jobs:
   - deployment: Deploy
     displayName: Deploy
