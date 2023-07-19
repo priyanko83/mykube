@@ -8,8 +8,8 @@ trigger:
       - main
     paths:
       include:
-      - Shopping/Shopping.Client/*
-      - aks/shoppingclient.yaml
+      - Create-AKS-NodePools-using-Terraform/src/Shopping/Shopping.Client/*
+      - Create-AKS-NodePools-using-Terraform/deploy/aks/shoppingclient.yaml
 
 resources:
 - repo: self
@@ -20,7 +20,7 @@ variables:
   dockerRegistryServiceConnection: 'e2bd5050-0b04-449c-8cd9-9367bbf7b47e'
   imageRepository: 'shoppingclient'
   containerRegistry: 'shoppingacr.azurecr.io'
-  dockerfilePath: 'Shopping/Shopping.Client/Dockerfile'
+  dockerfilePath: 'Create-AKS-NodePools-using-Terraform/src/Shopping/Shopping.Client/Dockerfile'
   tag: '$(Build.BuildId)'
   imagePullSecret: 'shoppingacr20662ab5-auth'
 
@@ -44,7 +44,7 @@ stages:
         repository: $(imageRepository)
         dockerfile: $(dockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
-        buildContext: $(Build.SourcesDirectory)/Shopping
+        buildContext: $(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src/Shopping
         tags: |
           $(tag)
           
@@ -77,7 +77,7 @@ stages:
             inputs:
               action: deploy
               manifests: |
-                $(Pipeline.Workspace)/aks/shoppingclient.yaml
+                $(Pipeline.Workspace)/Create-AKS-NodePools-using-Terraform/src/aks/shoppingclient.yaml
               imagePullSecrets: |
                 $(imagePullSecret)
               containers: |
