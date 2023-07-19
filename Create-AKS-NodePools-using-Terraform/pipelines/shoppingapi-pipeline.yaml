@@ -1,37 +1,28 @@
-# Deploy to Azure Kubernetes Service
-# Build and push image to Azure Container Registry; Deploy to Azure Kubernetes Service
+# Docker
+# Build and push an image to Azure Container Registry
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-    branches:
-      include:
-      - main
-    paths:
-      include:
-      - Create-AKS-NodePools-using-Terraform/src/Shopping/Shopping.API/*
-      - Create-AKS-NodePools-using-Terraform/deploy/aks/shoppingapi.yaml
+- main
 
 resources:
 - repo: self
 
 variables:
-
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: 'e2bd5050-0b04-449c-8cd9-9367bbf7b47e'
+  dockerRegistryServiceConnection: '63d564af-9226-4827-a519-889989f5a71d'
   imageRepository: 'shoppingapi'
   containerRegistry: 'poc12378acr.azurecr.io'
-  dockerfilePath: 'Create-AKS-NodePools-using-Terraform/src/Shopping/Shopping.API/Dockerfile'
+  dockerfilePath: '$(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src/Shopping.API/Dockerfile'
   tag: '$(Build.BuildId)'
-  imagePullSecret: 'poc12378acr20662ab5-auth'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
-  
 
 stages:
 - stage: Build
-  displayName: Build stage
-  jobs:  
+  displayName: Build and push stage
+  jobs:
   - job: Build
     displayName: Build
     pool:
@@ -44,23 +35,21 @@ stages:
         repository: $(imageRepository)
         dockerfile: $(dockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
-        buildContext: $(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src/Shopping.API
+        buildContext: $(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src
         tags: |
           $(tag)
-          
-    - upload: aks
-      artifact: aks
+    - upload: Create-AKS-NodePools-using-Terraform/deploy/aks
+      artifact: Create-AKS-NodePools-using-Terraform/deploy/aks
 
 - stage: Deploy
   displayName: Deploy stage
-  dependsOn: Build
-
+  dependsOn: Build  
   jobs:
   - deployment: Deploy
     displayName: Deploy
     pool:
       vmImage: $(vmImageName)
-    environment: 'aspnetrunrundevops.default'
+    environment: 'priyanko83mykube.default'
     strategy:
       runOnce:
         deploy:
@@ -82,4 +71,3 @@ stages:
                 $(imagePullSecret)
               containers: |
                 $(containerRegistry)/$(imageRepository):$(tag)
-
