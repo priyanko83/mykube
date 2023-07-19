@@ -38,5 +38,5 @@ stages:
         buildContext: $(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src
         tags: |
           $(tag)
-    - upload: aks
-      artifact: aks
+    - upload: Create-AKS-NodePools-using-Terraform/deploy/aks
+      artifact: Create-AKS-NodePools-using-Terraform/deploy/aks
