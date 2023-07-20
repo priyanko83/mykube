@@ -39,7 +39,7 @@ stages:
         tags: |
           $(tag)
     - upload: Create-AKS-NodePools-using-Terraform/deploy/aks
-      artifact: Create-AKS-NodePools-using-Terraform/deploy/aks
+      artifact: aks
 
 - stage: Deploy
   displayName: Deploy stage
@@ -59,6 +59,6 @@ stages:
             inputs:
               action: deploy
               manifests: |
-                $(Pipeline.Workspace)/shoppingapi.yaml
+                $(Pipeline.Workspace)/aks/shoppingapi.yaml
               containers: |
                 $(containerRegistry)/$(imageRepository):$(tag)
