@@ -11,9 +11,11 @@ resources:
 variables:
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: 'a8ef7400-5409-4d49-b620-6376d68107bb'
-  imageRepository: 'shoppingapi'
+  shoppingapiimageRepository: 'shoppingapi'
+  shoppingclientimageRepository: 'shoppingclient'
   containerRegistry: 'poc12378acr.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src/Shopping.API/Dockerfile'
+  dockerfilePathShoppingAPI: '$(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src/Shopping.API/Dockerfile'
+  dockerfilePathShoppingClient: '$(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src/Shopping.Client/Dockerfile'
   tag: '1.0.0'
 
   # Agent VM image name
@@ -29,11 +31,28 @@ stages:
       vmImage: $(vmImageName)
     steps:
     - task: Docker@2
-      displayName: Build and push an image to container registry
+      displayName: Build and push shopping api image to container registry
       inputs:
         command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
+        repository: $(shoppingapiimageRepository)
+        dockerfile: $(dockerfilePathShoppingAPI)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        buildContext: $(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src
+        tags: |
+          $(tag)
+    - upload: Create-AKS-NodePools-using-Terraform/deploy/aks
+      artifact: aks
+  - job: Build
+    displayName: Build Shopping Client
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: Build and push shopping client image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(shoppingclientimageRepository)
+        dockerfile: $(dockerfilePathShoppingClient)
         containerRegistry: $(dockerRegistryServiceConnection)
         buildContext: $(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src
         tags: |
@@ -42,11 +61,11 @@ stages:
       artifact: aks
 
 - stage: Deploy
-  displayName: Deploy stage
+  displayName: Deploy shopping api
   dependsOn: Build  
   jobs:
   - deployment: Deploy
-    displayName: Deploy
+    displayName: Deploy shopping api
     pool:
       vmImage: $(vmImageName)
     environment: 'priyanko83mykube-1541.default'
