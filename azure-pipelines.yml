@@ -39,7 +39,7 @@ stages:
         tags: |
           $(tag)
     - upload: Create-AKS-NodePools-using-Terraform/deploy/aks
-      artifact: Create-AKS-NodePools-using-Terraform/deploy/aks
+      artifact: aks
 
 - stage: Deploy
   displayName: Deploy stage
@@ -53,21 +53,12 @@ stages:
     strategy:
       runOnce:
         deploy:
-          steps:
-          - task: KubernetesManifest@0
-            displayName: Create imagePullSecret
-            inputs:
-              action: createSecret
-              secretName: $(imagePullSecret)
-              dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
-              
+          steps: 
           - task: KubernetesManifest@0
             displayName: Deploy to Kubernetes cluster
             inputs:
               action: deploy
               manifests: |
-                $(Pipeline.Workspace)/Create-AKS-NodePools-using-Terraform/src/aks/shoppingapi.yaml
-              imagePullSecrets: |
-                $(imagePullSecret)
+                $(Pipeline.Workspace)/aks/shoppingapi.yaml
               containers: |
                 $(containerRegistry)/$(imageRepository):$(tag)
