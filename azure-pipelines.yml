@@ -59,6 +59,6 @@ stages:
             inputs:
               action: deploy
               manifests: |
-                $(Pipeline.Workspace)/Create-AKS-NodePools-using-Terraform/src/aks/shoppingapi.yaml
+                $(Pipeline.Workspace)/aks/shoppingapi.yaml
               containers: |
                 $(containerRegistry)/$(imageRepository):$(tag)
