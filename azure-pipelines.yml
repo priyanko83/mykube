@@ -49,7 +49,7 @@ stages:
     displayName: Deploy
     pool:
       vmImage: $(vmImageName)
-    environment: 'priyanko83mykube.default'
+    environment: 'priyanko83mykube-1541.default'
     strategy:
       runOnce:
         deploy:
