@@ -1,37 +1,28 @@
-# Deploy to Azure Kubernetes Service
-# Build and push image to Azure Container Registry; Deploy to Azure Kubernetes Service
+# Docker
+# Build and push an image to Azure Container Registry
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-    branches:
-      include:
-      - main
-    paths:
-      include:
-      - Create-AKS-NodePools-using-Terraform/src/Shopping/Shopping.Client/*
-      - Create-AKS-NodePools-using-Terraform/deploy/aks/shoppingclient.yaml
+- main
 
 resources:
 - repo: self
 
 variables:
-
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: 'e2bd5050-0b04-449c-8cd9-9367bbf7b47e'
+  dockerRegistryServiceConnection: 'a8ef7400-5409-4d49-b620-6376d68107bb'
   imageRepository: 'shoppingclient'
   containerRegistry: 'poc12378acr.azurecr.io'
-  dockerfilePath: 'Create-AKS-NodePools-using-Terraform/src/Shopping/Shopping.Client/Dockerfile'
-  tag: '$(Build.BuildId)'
-  imagePullSecret: 'poc12378acr20662ab5-auth'
+  dockerfilePath: '$(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src/Shopping.Client/Dockerfile'
+  tag: '1.0.0'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
-  
 
 stages:
 - stage: Build
-  displayName: Build stage
-  jobs:  
+  displayName: Build and push stage
+  jobs:
   - job: Build
     displayName: Build
     pool:
@@ -44,42 +35,30 @@ stages:
         repository: $(imageRepository)
         dockerfile: $(dockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
-        buildContext: $(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src/Shopping.Client
+        buildContext: $(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src
         tags: |
           $(tag)
-          
-    - upload: aks
+    - upload: Create-AKS-NodePools-using-Terraform/deploy/aks
       artifact: aks
 
 - stage: Deploy
   displayName: Deploy stage
-  dependsOn: Build
-
+  dependsOn: Build  
   jobs:
   - deployment: Deploy
     displayName: Deploy
     pool:
       vmImage: $(vmImageName)
-    environment: 'aspnetrunrundevops.default'
+    environment: 'priyanko83mykube-1541.default'
     strategy:
       runOnce:
         deploy:
-          steps:
-          - task: KubernetesManifest@0
-            displayName: Create imagePullSecret
-            inputs:
-              action: createSecret
-              secretName: $(imagePullSecret)
-              dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
-              
+          steps: 
           - task: KubernetesManifest@0
             displayName: Deploy to Kubernetes cluster
             inputs:
               action: deploy
               manifests: |
-                $(Pipeline.Workspace)/Create-AKS-NodePools-using-Terraform/src/aks/shoppingclient.yaml
-              imagePullSecrets: |
-                $(imagePullSecret)
+                $(Pipeline.Workspace)/aks/shoppingclient.yaml
               containers: |
                 $(containerRegistry)/$(imageRepository):$(tag)
-

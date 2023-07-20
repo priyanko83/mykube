@@ -34,7 +34,7 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
 
   default_node_pool {
     name                 = "systempool"
-    vm_size              = "Standard_DS2_v2"
+    vm_size              = "Standard_B2ms"
     orchestrator_version = data.azurerm_kubernetes_service_versions.current.latest_version
     #availability_zones   = [1, 2, 3]
     # Added June2023
@@ -89,12 +89,6 @@ azure_active_directory_role_based_access_control {
   managed = true
   admin_group_object_ids = [azuread_group.aks_administrators.id]
 }
-
-# Windows Profile
-  windows_profile {
-    admin_username = var.windows_admin_username
-    admin_password = var.windows_admin_password
-  }
 
 # Linux Profile
   linux_profile {
