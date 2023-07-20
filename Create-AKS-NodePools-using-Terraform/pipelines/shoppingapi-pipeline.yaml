@@ -10,7 +10,7 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '63d564af-9226-4827-a519-889989f5a71d'
+  dockerRegistryServiceConnection: 'a8ef7400-5409-4d49-b620-6376d68107bb'
   imageRepository: 'shoppingapi'
   containerRegistry: 'poc12378acr.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src/Shopping.API/Dockerfile'
