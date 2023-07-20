@@ -1,3 +1,7 @@
+az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
+az aks browse  --name terraform-aks-dev-cluster --resource-group terraform-aks-dev 
+
+
 Start Docker Images
 run  = docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d
 stop = docker-compose -f docker-compose.yml -f docker-compose.override.yml down

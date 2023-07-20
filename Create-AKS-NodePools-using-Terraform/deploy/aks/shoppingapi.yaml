@@ -17,7 +17,7 @@ spec:
       containers:
         - name: shoppingapi
           image: poc12378acr.azurecr.io/shoppingapi:v1
-          imagePullPolicy: IfNotPresent          
+          imagePullPolicy: Always          
           ports:
             - containerPort: 80
           env:
