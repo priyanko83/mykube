@@ -1,0 +1,9 @@
+1. Get yourself added to admin AD group
+
+2. Create new acr connection by adding docker push task
+a8ef7400-5409-4d49-b620-6376d68107bb
+
+3. Create new environment: 'priyanko83mykube-xxxx.default' by adding a deploy k8s task
+
+Troubleshooting
+kubectl describe pod shoppingapi-deployment-6bbc8d758-r68x4 -n default
