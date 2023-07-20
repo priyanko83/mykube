@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: shoppingapi
-          image: poc12378acr.azurecr.io/shoppingapi:v1
-          imagePullPolicy: Always          
+          image: poc12378acr.azurecr.io/shoppingapi:1.0.0
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:
@@ -35,8 +35,6 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "0.3"
-      imagePullSecrets:
-        - name: acr-secret
 ---
 apiVersion: v1
 kind: Service

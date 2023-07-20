@@ -14,7 +14,7 @@ variables:
   imageRepository: 'shoppingapi'
   containerRegistry: 'poc12378acr.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Create-AKS-NodePools-using-Terraform/src/Shopping.API/Dockerfile'
-  tag: '$(Build.BuildId)'
+  tag: '1.0.0'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
