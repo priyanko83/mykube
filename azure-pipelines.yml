@@ -59,6 +59,6 @@ stages:
             inputs:
               action: deploy
               manifests: |
-                $(Pipeline.Workspace)/aks/shoppingapi.yaml
+                $(Pipeline.Workspace)/shoppingapi.yaml
               containers: |
                 $(containerRegistry)/$(imageRepository):$(tag)
