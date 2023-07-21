@@ -1,6 +1,6 @@
 az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster --admin
 az aks browse  --name terraform-aks-dev-cluster --resource-group terraform-aks-dev
-az aks check-acr --resource-group terraform-aks-dev --name terraform-aks-dev-cluster --acr <myacr>.azurecr.io
+az aks check-acr --resource-group terraform-aks-dev --name terraform-aks-dev-cluster --acr poc12378acr.azurecr.io
 
 
 Start Docker Images
