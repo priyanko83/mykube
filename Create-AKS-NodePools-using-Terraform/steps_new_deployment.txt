@@ -7,3 +7,168 @@ a8ef7400-5409-4d49-b620-6376d68107bb
 
 Troubleshooting
 kubectl describe pod shoppingapi-deployment-6bbc8d758-r68x4 -n default
+
+choco install kubernetes-helm
+helm repo add stable https://charts.helm.sh/stable
+az aks get-credentials --resource-group terraform-aks-dev --name terraform-aks-dev-cluster
+
+# Get the resource group name of the AKS cluster
+az aks show --resource-group terraform-aks-dev --name terraform-aks-dev-cluster --query nodeResourceGroup -o tsv
+
+# TEMPLATE - Create a public IP address with the static allocation
+az network public-ip create --resource-group terraform-aks-dev-nrg --name myAKSPublicIPForIngress --sku Standard --allocation-method static --query publicIp.ipAddress -o tsv
+
+20.245.252.249
+
+# Use Helm to deploy an NGINX ingress controller
+helm install ingress-nginx ingress-nginx/ingress-nginx --namespace ingress-basic --set controller.replicaCount=2 --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux --set controller.service.externalTrafficPolicy=Local --set controller.service.loadBalancerIP="20.245.252.249"
+
+kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-1.12/deploy/manifests/00-crds.yaml
+
+kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.3.0/cert-manager.yaml
+
+
+kubectl apply -f kube-manifests/ --recursive
+======================================================================
+June 6 2020
+--------------
+az login
+az aks get-credentials --resource-group AKS-RG  --name pm-aks-cluster
+az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+az login
+az aks get-credentials --resource-group AKS-RG  --name pm-aks-cluster
+az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
+az aks browse --resource-group AKS-RG  --name pm-aks-cluster
+
+
+
+#STEP 01: Create a dedicated namespace
+kubectl create namespace poc-ingress
+
+#STEP 02: Create docker hub registry keys (or Azure Container Storage)
+kubectl create secret docker-registry priyankodockerhubregistrykey --docker-server=https://index.docker.io/v1/ --docker-username=priyanko83 --docker-password=Ab289405 --docker-email=priyanko.mukherjee@gmail.com  --namespace poc-ingress
+
+#For Chocolatey
+
+
+
+#STEP 03: Setup RBAC cluster by helm-rbac.yaml file
+kubectl apply -f helm-rbac.yaml
+
+#STEP 04: Use the helm repo command to add the official Helm stable charts repository. The repo stable/nginx-ingress should showup in search command
+#helm repo add stable https://kubernetes-charts.storage.googleapis.com/    (Since November 13, 2020, the new location for the stable repository is https://charts.helm.sh/stable)
+helm repo add "stable" "https://charts.helm.sh/stable"
+helm search repo stable
+
+#STEP 05: It is important to do this as otherwise we get an error that says "Cannot find stable/nginx-ingress"
+helm repo update
+
+#STEP 06: Install nginx ingress
+helm install pm-poc-nginx-ingress stable/nginx-ingress --namespace poc-ingress --set controller.replicaCount=2 --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+
+#STEP 06a: Configure DNS & IP - Fetch IP Address of your ingress controller
+kubectl get service -l app=nginx-ingress --namespace poc-ingress
+
+#STEP 06b: Configure DNS & IP Set Public IP address of your ingress controller
+$IP="20.204.106.180"
+
+#STEP 06c: Configure DNS & IP Name to associate with public IP address
+$DNSNAME="pm-aks-microservices"
+#STEP 06d: Configure DNS & IP - Get the resource-id of the public ip
+$PUBLICIPID=$(az network public-ip list --query "[?ipAddress!=null]|[?contains(ipAddress, '$IP')].[id]" --output tsv)
+#STEP 06e: Configure DNS & IP - Update public ip address with DNS name
+az network public-ip update --ids $PUBLICIPID --dns-name $DNSNAME
+#Above opertions create a fqdn equal to: pm-aks-microservices.centralindia.azmk8s.io
+
+#STEP 07: create ssl certificate (use ubuntu server to create the files and then copy back to current directory C:\dockersol)
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -out pm-aks-microservices-tls.crt -keyout pm-aks-microservices-tls.key -subj "/CN=pm-aks-microservices.centralindia.cloudapp.azure.com/O=pm-aks-microservices-tls"
+
+#STEP 08: create secret
+kubectl create secret tls pm-aks-microservices-tls --namespace poc-ingress --key pm-aks-microservices-tls.key --cert pm-aks-microservices-tls.crt
+
+#STEP 09: Make sure the .crt and .key files are in same folder as script being executed
+
+
+
+#STEP Optional: Test nginx controller. Before you can install the sample Helm charts, add the Azure samples repository to your Helm environment as follows:
+helm repo add azure-samples https://azure-samples.github.io/helm-charts/  --namespace poc-ingress
+#Create the first demo application from a Helm chart with the following command:
+helm install aks-helloworld-one azure-samples/aks-helloworld --namespace poc-ingress
+#Now install a second instance of the demo application. For the second instance, you specify a new title so that the two applications are visually distinct. You also specify a unique service name:
+helm install aks-helloworld-two azure-samples/aks-helloworld --namespace poc-ingress --set title="AKS Ingress Demo" --set serviceName="ingress-demo" --namespace poc-ingress
+
+#STEP 10: Build & deploy docker images.  Configure ingress
+sudo docker system prune  # for removing all stopped containers, all networks not used by at least one container, all dangling images, all build cache
+sudo docker rmi $(docker images -f "dangling=true" -q)
+sudo docker login --username=priyanko83
+Ab289405
+cd ~
+cd ./DockerSol
+
+sudo docker build -t priyanko83/gatewayapi:latest -f GatewayApi2/Dockerfile .
+sudo docker push priyanko83/gatewayapi:latest
+
+sudo docker build -t priyanko83/customerapi:latest -f CustomerAPI2/Dockerfile .
+sudo docker push priyanko83/customerapi:latest
+
+sudo docker build -t priyanko83/servicebuslistener:latest -f ServiceBusListener/Dockerfile .
+sudo docker push priyanko83/servicebuslistener:latest
+
+cd ~
+cd /home/priyanko/DockerFirstPoC/Dockerize/FrontendReact
+sudo docker build -t priyanko83/frontend-react:latest -f Dockerfile .
+sudo docker push priyanko83/frontend-react:latest
+
+cd ~
+cd /home/priyanko/DockerFirstPoC/AAD_MSAL_Angular_Frontend/AAD-Angular-FE
+sudo docker build -t priyanko83/frontend-angular:latest -f Dockerfile .
+sudo docker push priyanko83/frontend-angular:latest
+
+cd ~
+cd /home/priyanko/DockerFirstPoC/Dockerize/FrontendAngular
+sudo docker build -t priyanko83/frontend-angular:latest -f Dockerfile .
+sudo docker push priyanko83/frontend-angular:latest
+
+#STEP 10a: Build the .yaml filesfor Configmap, Deployment, Services. Then Deploy your docker images using those yaml files
+cd ~
+cd /home/priyanko/DockerFirstPoC/Dockerize
+
+kubectl apply -f InternalUrls.yaml
+
+kubectl delete -f dockersol.yaml
+kubectl apply -f dockersol.yaml
+
+
+#STEP 10: Build .yaml files for ingress. Setup ingress rules for your services
+
+kubectl delete -f dockersol-ingress-cert.yaml
+kubectl apply -f dockersol-ingress-cert.yaml
+
+
+=====================================================================================
+Other useful stuff
+
+
+az login
+az aks get-credentials --resource-group eshop-aks  --name eshop-aks-cluster
+az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+kubectl get pods --namespace kube-system
+kubectl get services --namespace kube-system
+kubectl get deployments --namespace kube-system
+kubectl get configmaps --namespace kube-system
+
+#Useful - Start bash shell to enter inside a pod
+kubectl exec --stdin --tty --namespace=poc-ingress servicebuslistener-7f494df4d-bjn5m -- /bin/bash
+
+
+kubectl delete deployment.apps/frontend-react
+kubectl delete service/frontend-react
+
+kubectl delete deployment.apps/gatewayapi
+kubectl delete service/gatewayapi
+
+kubectl  logs -f cert-manager-84467b85cd-8hzz4 -n ingress-basic
