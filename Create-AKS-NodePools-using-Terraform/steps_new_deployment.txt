@@ -29,6 +29,9 @@ kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.3
 
 
 kubectl apply -f kube-manifests/ --recursive
+
+az aks check-acr --name terraform-aks-dev-cluster --resource-group terraform-aks-dev --acr poc12378acr.azurecr.io
+
 ======================================================================
 June 6 2020
 --------------
