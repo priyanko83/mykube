@@ -115,3 +115,19 @@ resource "azurerm_role_assignment" "acr_pull" {
   principal_id         = azurerm_kubernetes_cluster.aks_cluster.kubelet_identity[0].object_id
   skip_service_principal_aad_check = true
 }
+
+provider "helm" {
+  version = "1.2.2"
+  kubernetes {
+    host = azurerm_kubernetes_cluster.aks_cluster.kube_config[0].host
+
+    client_key             = base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config[0].client_key)
+    client_certificate     = base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config[0].client_certificate)
+    cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config[0].cluster_ca_certificate)
+    load_config_file       = false
+  }
+}
+
+output "kube_config" {
+  value = azurerm_kubernetes_cluster.aks_cluster.kube_config_raw
+}
