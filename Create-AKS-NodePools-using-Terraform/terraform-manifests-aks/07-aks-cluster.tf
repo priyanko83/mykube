@@ -116,27 +116,11 @@ resource "azurerm_role_assignment" "acr_pull" {
   skip_service_principal_aad_check = true
 }
 
-
-provider "kubernetes" {
-  load_config_file       = "false"
-  host                   = azurerm_kubernetes_cluster.aks_cluster.kube_config.0.host
-  username               = azurerm_kubernetes_cluster.aks_cluster.kube_config.0.username
-  password               = azurerm_kubernetes_cluster.aks_cluster.kube_config.0.password
-  client_certificate     = "${base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config.0.client_certificate)}"
-  client_key             = "${base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config.0.client_key)}"
-  cluster_ca_certificate = "${base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config.0.cluster_ca_certificate)}"
-}
-
 #https://github.com/learnk8s/terraform-aks/blob/master/03-aks-helm/main.tf
 provider "helm" {
   version = "1.2.2"
   kubernetes {
-    host = azurerm_kubernetes_cluster.aks_cluster.kube_config.0.host
-
-    client_key             = base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config.0.client_key)
-    client_certificate     = base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config.0.client_certificate)
-    cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.aks_cluster.kube_config.0.cluster_ca_certificate)
-    load_config_file       = false
+    config_path = "~/.kube/config"
   }
 }
 
