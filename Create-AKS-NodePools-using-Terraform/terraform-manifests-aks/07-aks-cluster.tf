@@ -85,6 +85,7 @@ oms_agent {
 #    }
 #  }
 # Added June 2023
+#https://medium.com/@maryam.tavakoli.3/authentication-and-authorization-in-azure-kubernetes-service-aks-with-terraform-c6a045bacd09
 azure_active_directory_role_based_access_control {
   managed = true
   admin_group_object_ids = [azuread_group.aks_administrators.id]
