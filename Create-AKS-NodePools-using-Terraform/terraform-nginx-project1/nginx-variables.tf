@@ -1,12 +1,12 @@
 variable "name" {
   type        = string
   description = "Name of helm release"
-  default     = "ingress-nginx"
+  default     = "project1-nginx1"
 }
 variable "namespace" {
   type        = string
   description = "Name of namespace where nginx controller should be deployed"
-  default     = "ingress-basic"
+  default     = "project1-namespace"
 }
 
 variable "chart_version" {
@@ -24,7 +24,7 @@ variable "atomic" {
 variable "ingress_class_name" {
   type        = string
   description = "IngressClass resource name"
-  default     = "nginx"
+  default     = "project1nginx"
 }
 
 variable "ingress_class_is_default" {

@@ -1,3 +1,11 @@
+#https://github.com/learnk8s/terraform-aks/blob/master/03-aks-helm/main.tf
+provider "helm" {
+  version = "1.2.2"
+  kubernetes {
+    config_path = "~/.kube/config"
+  }
+}
+
 resource "helm_release" "application" {
   name             = var.name
   chart            = local.helm_chart
