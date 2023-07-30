@@ -85,6 +85,9 @@ oms_agent {
 #    }
 #  }
 # Added June 2023
+#From v1.24, kubeconfig value cant be read without kubelogin. Now, kubelogin can be ued by using an exec block in kubernetes provider
+# There we need to use userid/service principal. Below setting enables the user/service principal belonging to specific administrator group
+#to access kubeconfig data and provision project specific kubernetes resource such as nginx and others to a pre-exiting kubernetes cluster
 #https://medium.com/@maryam.tavakoli.3/authentication-and-authorization-in-azure-kubernetes-service-aks-with-terraform-c6a045bacd09
 azure_active_directory_role_based_access_control {
   managed = true
