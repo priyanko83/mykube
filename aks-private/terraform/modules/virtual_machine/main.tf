@@ -93,7 +93,7 @@ resource "azurerm_linux_virtual_machine" "virtual_machine" {
 
   admin_ssh_key {
     username   = var.vm_user
-    public_key = var.admin_ssh_public_key
+    public_key = file(var.admin_ssh_public_key)
   }
 
   source_image_reference {

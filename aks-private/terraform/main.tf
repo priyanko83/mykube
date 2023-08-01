@@ -13,7 +13,11 @@ provider "azurerm" {
 
 terraform {
   backend "azurerm" {
-  }
+    resource_group_name   = "terraform-rg"
+    storage_account_name  = "terraformstatepoc2"
+    container_name        = "aksprivate"
+    key                   = "dev.terraform.tfstate"
+  } 
 }
 
 locals {
@@ -114,41 +118,6 @@ module "vnet_peering" {
   peering_name_2_to_1 = "${var.aks_vnet_name}To${var.hub_vnet_name}"
 }
 
-module "firewall" {
-  source                       = "./modules/firewall"
-  name                         = var.firewall_name
-  resource_group_name          = azurerm_resource_group.rg.name
-  zones                        = var.firewall_zones
-  threat_intel_mode            = var.firewall_threat_intel_mode
-  location                     = var.location
-  sku_name                     = var.firewall_sku_name 
-  sku_tier                     = var.firewall_sku_tier
-  pip_name                     = "${var.firewall_name}PublicIp"
-  subnet_id                    = module.hub_network.subnet_ids["AzureFirewallSubnet"]
-  log_analytics_workspace_id   = module.log_analytics_workspace.id
-  log_analytics_retention_days = var.log_analytics_retention_days
-}
-
-module "routetable" {
-  source               = "./modules/route_table"
-  resource_group_name  = azurerm_resource_group.rg.name
-  location             = var.location
-  route_table_name     = local.route_table_name
-  route_name           = local.route_name
-  firewall_private_ip  = module.firewall.private_ip_address
-  subnets_to_associate = {
-    (var.default_node_pool_subnet_name) = {
-      subscription_id      = data.azurerm_client_config.current.subscription_id
-      resource_group_name  = azurerm_resource_group.rg.name
-      virtual_network_name = module.aks_network.name
-    }
-    (var.additional_node_pool_subnet_name) = {
-      subscription_id      = data.azurerm_client_config.current.subscription_id
-      resource_group_name  = azurerm_resource_group.rg.name
-      virtual_network_name = module.aks_network.name
-    }
-  }
-}
 
 module "container_registry" {
   source                       = "./modules/container_registry"
@@ -207,8 +176,6 @@ module "aks_cluster" {
   image_cleaner_enabled                    = var.image_cleaner_enabled
   azure_policy_enabled                     = var.azure_policy_enabled
   http_application_routing_enabled         = var.http_application_routing_enabled
-
-  depends_on                               = [module.routetable]
 }
 
 resource "azurerm_role_assignment" "network_contributor" {
@@ -300,8 +267,6 @@ module "node_pool" {
   os_type                      = var.additional_node_pool_os_type
   priority                     = var.additional_node_pool_priority
   tags                         = var.tags
-
-  depends_on                   = [module.routetable]
 }
 
 module "key_vault" {

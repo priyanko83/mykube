@@ -29,7 +29,7 @@ resource "azurerm_storage_account" "state-sta" {
   account_kind = "StorageV2"
   account_tier = "Standard"
   access_tier = "Hot"
-  account_replication_type = "ZRS"
+  account_replication_type = "LRS"
   enable_https_traffic_only = true
    
   lifecycle {

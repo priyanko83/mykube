@@ -135,13 +135,13 @@ variable "kubernetes_version" {
 
 variable "default_node_pool_vm_size" {
   description = "Specifies the vm size of the default node pool"
-  default     = "Standard_F8s_v2"
+  default     = "Standard_B2ms"
   type        = string
 }
 
 variable "default_node_pool_availability_zones" {
   description = "Specifies the availability zones of the default node pool"
-  default     = ["1", "2", "3"]
+  default     = ["1"]
   type        = list(string)
 }
 
@@ -244,13 +244,13 @@ variable "default_node_pool_max_count" {
 variable "default_node_pool_min_count" {
   description = "(Required) The minimum number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be less than or equal to max_count."
   type          = number
-  default       = 3
+  default       = 1
 }
 
 variable "default_node_pool_node_count" {
   description = "(Optional) The initial number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be a value in the range min_count - max_count."
   type          = number
-  default       = 3
+  default       = 1
 }
 
 variable "additional_node_pool_subnet_name" {
@@ -274,13 +274,13 @@ variable "additional_node_pool_name" {
 variable "additional_node_pool_vm_size" {
   description = "(Required) The SKU which should be used for the Virtual Machines used in this Node Pool. Changing this forces a new resource to be created."
   type        = string
-  default     = "Standard_F8s_v2"
+  default     = "Standard_B2ms"
 }
 
 variable "additional_node_pool_availability_zones" {
   description = "(Optional) A list of Availability Zones where the Nodes in this Node Pool should be created in. Changing this forces a new resource to be created."
   type        = list(string)
-  default = ["1", "2", "3"]
+  default = ["1"]
 }
 
 variable "additional_node_pool_enable_auto_scaling" {
@@ -352,13 +352,13 @@ variable "additional_node_pool_max_count" {
 variable "additional_node_pool_min_count" {
   description = "(Required) The minimum number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be less than or equal to max_count."
   type          = number
-  default       = 3
+  default       = 1
 }
 
 variable "additional_node_pool_node_count" {
   description = "(Optional) The initial number of nodes which should exist within this Node Pool. Valid values are between 0 and 1000 and must be a value in the range min_count - max_count."
   type          = number
-  default       = 3
+  default       = 1
 }
 
 variable "domain_name_label" {
@@ -426,13 +426,13 @@ variable "vm_public_ip" {
 
 variable "vm_size" {
   description = "Specifies the size of the jumpbox virtual machine"
-  default     = "Standard_DS1_v2"
+  default     = "Standard_B2ms"
   type        = string
 }
 
 variable "vm_os_disk_storage_account_type" {
   description = "Specifies the storage account type of the os disk of the jumpbox virtual machine"
-  default     = "Premium_LRS"
+  default     = "Standard_LRS"
   type        = string
 
   validation {
@@ -544,31 +544,31 @@ variable "key_vault_sku_name" {
   }
 }
 
-variable"key_vault_enabled_for_deployment" {
+variable "key_vault_enabled_for_deployment" {
   description = "(Optional) Boolean flag to specify whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault. Defaults to false."
   type        = bool
   default     = true
 }
 
-variable"key_vault_enabled_for_disk_encryption" {
+variable "key_vault_enabled_for_disk_encryption" {
   description = " (Optional) Boolean flag to specify whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys. Defaults to false."
   type        = bool
   default     = true
 }
 
-variable"key_vault_enabled_for_template_deployment" {
+variable "key_vault_enabled_for_template_deployment" {
   description = "(Optional) Boolean flag to specify whether Azure Resource Manager is permitted to retrieve secrets from the key vault. Defaults to false."
   type        = bool
   default     = true
 }
 
-variable"key_vault_enable_rbac_authorization" {
+variable "key_vault_enable_rbac_authorization" {
   description = "(Optional) Boolean flag to specify whether Azure Key Vault uses Role Based Access Control (RBAC) for authorization of data actions. Defaults to false."
   type        = bool
   default     = true
 }
 
-variable"key_vault_purge_protection_enabled" {
+variable "key_vault_purge_protection_enabled" {
   description = "(Optional) Is Purge Protection enabled for this Key Vault? Defaults to false."
   type        = bool
   default     = true
@@ -611,16 +611,19 @@ variable "admin_username" {
 variable "ssh_public_key" {
   description = "(Required) Specifies the SSH public key for the jumpbox virtual machine and AKS worker nodes."
   type        = string
+  default     = ".ssh/id_rsa.pub"
 }
 
 variable "script_storage_account_name" {
   description = "(Required) Specifies the name of the storage account that contains the custom script."
   type        = string
+  default     = "terraformstatepoc2"
 }
 
 variable "script_storage_account_key" {
   description = "(Required) Specifies the name of the storage account that contains the custom script."
   type        = string
+  default     = "xfr+WOCAE1+8UXMMf2s45cm1q1PCiE+Y4RPwxB/lMsvQ475vxW5CH+/ShViCf9UcBcYvQmAUENHd+ASt6PqIkA=="
 }
 
 variable "container_name" {
