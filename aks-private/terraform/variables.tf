@@ -408,7 +408,7 @@ variable "firewall_threat_intel_mode" {
 
 variable "firewall_zones" {
   description = "Specifies the availability zones of the Azure Firewall"
-  default     = ["1", "2", "3"]
+  default     = ["1"]
   type        = list(string)
 }
 
