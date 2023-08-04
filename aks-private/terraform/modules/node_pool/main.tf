@@ -26,7 +26,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pool" {
   max_pods                     = var.max_pods
   max_count                    = var.max_count
   min_count                    = var.min_count
-  node_count                   = var.node_count
   os_disk_size_gb              = var.os_disk_size_gb
   os_disk_type                 = var.os_disk_type
   os_type                      = var.os_type

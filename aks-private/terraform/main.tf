@@ -123,13 +123,28 @@ module "vnet_peering" {
   peering_name_2_to_1 = "${var.aks_vnet_name}To${var.hub_vnet_name}"
 }
 
+module "firewall" {
+  source                       = "./modules/firewall"
+  name                         = var.firewall_name
+  resource_group_name          = azurerm_resource_group.rg.name
+  zones                        = var.firewall_zones
+  threat_intel_mode            = var.firewall_threat_intel_mode
+  location                     = var.location
+  sku_name                     = var.firewall_sku_name 
+  sku_tier                     = var.firewall_sku_tier
+  pip_name                     = "${var.firewall_name}PublicIp"
+  subnet_id                    = module.hub_network.subnet_ids["AzureFirewallSubnet"]
+  log_analytics_workspace_id   = module.log_analytics_workspace.id
+  log_analytics_retention_days = var.log_analytics_retention_days
+}
+
 module "routetable" {
   source               = "./modules/route_table"
   resource_group_name  = azurerm_resource_group.rg.name
   location             = var.location
   route_table_name     = local.route_table_name
   route_name           = local.route_name
-  firewall_private_ip  = "10.06.06.06"
+  firewall_private_ip  = module.firewall.private_ip_address
   subnets_to_associate = {
     (var.default_node_pool_subnet_name) = {
       subscription_id      = data.azurerm_client_config.current.subscription_id
@@ -179,7 +194,6 @@ module "aks_cluster" {
   default_node_pool_max_pods               = var.default_node_pool_max_pods
   default_node_pool_max_count              = var.default_node_pool_max_count
   default_node_pool_min_count              = var.default_node_pool_min_count
-  default_node_pool_node_count             = var.default_node_pool_node_count
   default_node_pool_os_disk_type           = var.default_node_pool_os_disk_type
   tags                                     = var.tags
   network_dns_service_ip                   = var.network_dns_service_ip
@@ -292,7 +306,6 @@ module "node_pool" {
   max_pods                     = var.additional_node_pool_max_pods
   max_count                    = var.additional_node_pool_max_count
   min_count                    = var.additional_node_pool_min_count
-  node_count                   = var.additional_node_pool_node_count
   os_type                      = var.additional_node_pool_os_type
   priority                     = var.additional_node_pool_priority
   tags                         = var.tags
