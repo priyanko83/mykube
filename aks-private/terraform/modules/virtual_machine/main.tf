@@ -75,6 +75,11 @@ resource "azurerm_network_interface_security_group_association" "nsg_association
   depends_on = [azurerm_network_security_group.nsg]
 }
 
+resource "tls_private_key" "example_ssh" {
+    algorithm = "RSA"
+    rsa_bits = 4096
+}
+
 resource "azurerm_linux_virtual_machine" "virtual_machine" {
   name                          = var.name
   location                      = var.location
@@ -93,7 +98,7 @@ resource "azurerm_linux_virtual_machine" "virtual_machine" {
 
   admin_ssh_key {
     username   = var.vm_user
-    public_key = file(var.admin_ssh_public_key)
+    public_key = tls_private_key.example_ssh.public_key_openssh
   }
 
   source_image_reference {

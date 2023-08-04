@@ -97,7 +97,7 @@ variable "log_analytics_retention_days" {
 variable "admin_ssh_public_key" {
   description = "Specifies the public SSH key"
   type        = string
-  default     = ".ssh/id_rsa.pub"
+  default     = "~/.ssh/id_rsa.pub"
 }
 
 variable "script_storage_account_name" {

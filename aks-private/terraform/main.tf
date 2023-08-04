@@ -35,6 +35,11 @@ resource "azurerm_resource_group" "rg" {
   tags     = var.tags
 }
 
+resource "tls_private_key" "aks_ssh" {
+    algorithm = "RSA"
+    rsa_bits = 4096
+}
+
 module "log_analytics_workspace" {
   source                           = "./modules/log_analytics"
   name                             = var.log_analytics_workspace_name
@@ -118,6 +123,26 @@ module "vnet_peering" {
   peering_name_2_to_1 = "${var.aks_vnet_name}To${var.hub_vnet_name}"
 }
 
+module "routetable" {
+  source               = "./modules/route_table"
+  resource_group_name  = azurerm_resource_group.rg.name
+  location             = var.location
+  route_table_name     = local.route_table_name
+  route_name           = local.route_name
+  firewall_private_ip  = "10.06.06.06"
+  subnets_to_associate = {
+    (var.default_node_pool_subnet_name) = {
+      subscription_id      = data.azurerm_client_config.current.subscription_id
+      resource_group_name  = azurerm_resource_group.rg.name
+      virtual_network_name = module.aks_network.name
+    }
+    (var.additional_node_pool_subnet_name) = {
+      subscription_id      = data.azurerm_client_config.current.subscription_id
+      resource_group_name  = azurerm_resource_group.rg.name
+      virtual_network_name = module.aks_network.name
+    }
+  }
+}
 
 module "container_registry" {
   source                       = "./modules/container_registry"
@@ -167,8 +192,10 @@ module "aks_cluster" {
   admin_group_object_ids                   = var.admin_group_object_ids
   azure_rbac_enabled                       = var.azure_rbac_enabled
   admin_username                           = var.admin_username
-  ssh_public_key                           = var.ssh_public_key
+  ssh_public_key                           = tls_private_key.aks_ssh.public_key_openssh
   keda_enabled                             = var.keda_enabled
+  #run below command
+  #az feature register --namespace "Microsoft.ContainerService" --name "AKS-KedaPreview"  
   vertical_pod_autoscaler_enabled          = var.vertical_pod_autoscaler_enabled
   workload_identity_enabled                = var.workload_identity_enabled
   oidc_issuer_enabled                      = var.oidc_issuer_enabled
@@ -176,6 +203,8 @@ module "aks_cluster" {
   image_cleaner_enabled                    = var.image_cleaner_enabled
   azure_policy_enabled                     = var.azure_policy_enabled
   http_application_routing_enabled         = var.http_application_routing_enabled
+
+  depends_on                               = [module.routetable]
 }
 
 resource "azurerm_role_assignment" "network_contributor" {
@@ -267,6 +296,8 @@ module "node_pool" {
   os_type                      = var.additional_node_pool_os_type
   priority                     = var.additional_node_pool_priority
   tags                         = var.tags
+
+  depends_on                   = [module.routetable]
 }
 
 module "key_vault" {
