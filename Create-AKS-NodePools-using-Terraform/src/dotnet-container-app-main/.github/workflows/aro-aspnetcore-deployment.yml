@@ -1,0 +1,228 @@
+name: aro-aspnetcore.deployment
+
+on: workflow_dispatch
+
+#on:
+#  push:
+#    branches: [ main ]
+#  pull_request:
+#    branches: [ main ]
+
+env:
+  AZ_RG_NAME: 'rg-dotnetcontainerapp-aro'
+  AZ_RG_LOCATION: 'eastus'
+  AZ_ACR_NAME: 'acrdotnetcontainerapp'
+  AZ_ARO_NAME: 'arodotnetcontainerapp'
+  AZ_SQLSERVER_NAME: 'sqldotnetcontainerapp'
+  AZ_KV_NAME: 'kvdotnetcontainerap'
+  AZ_LOADTEST_NAME: 'ltstdotnetcontainerap'
+
+jobs:
+
+  iac:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout code
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      # Log into Azure
+      - name: Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      # Create Resource Group
+      - name: Create Resource Group
+        run: |
+          if [ $(az group exists --name ${{ env.AZ_RG_NAME }}) = false ]; then
+            az group create --name ${{ env.AZ_RG_NAME }} --location ${{ env.AZ_RG_LOCATION }}
+          else
+              echo "Resource group already exists"
+          fi
+
+      # Deploy Bicep file
+      #- name: Deploy Template
+      #  uses: Azure/arm-deploy@v1
+      #  with:
+      #    resourceGroupName: ${{ env.AZ_RG_NAME }}
+      #    region: ${{ env.AZ_RG_LOCATION }}
+      #    template: src/ContainerApp.IAC/aro.bicep
+      #    deploymentMode: Incremental
+      #    deploymentName: 'gh-actions'
+      #    parameters: acrName=${{ env.AZ_ACR_NAME }} clusterName=${{ env.AZ_ARO_NAME }} aadClientId=${{ secrets.ARO_CLIENT_ID }} aadClientSecret=${{ secrets.ARO_CLIENT_SECRET }} aadObjectId=${{ secrets.ARO_AAD_OBJECT_ID }} rpObjectId=${{ secrets.ARO_RP_OBJECT_ID }} sqlserverName=${{ env.AZ_SQLSERVER_NAME }} sqlAdminLogin=${{ secrets.AZURE_SQL_USERNAME }} sqlAdminPassword=${{ secrets.AZURE_SQL_PASSWORD }} kvName=${{ env.AZ_KV_NAME }} loadTestName=${{ env.AZ_LOADTEST_NAME }}
+          
+  build:
+    needs: iac
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout code
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Change Version variable
+        uses: microsoft/variable-substitution@v1 
+        with:
+          files: 'src/ContainerApp.WebApp/appsettings.json'
+        env:
+          Version: ${{ GITHUB.RUN_NUMBER }}
+      
+      # Log into Azure
+      - name: Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Set ACR variables
+        run: |
+          url_acr=$(az acr show -n ${{ env.AZ_ACR_NAME }} --query loginServer --output tsv)
+          login_acr=$(az acr credential show -n ${{ env.AZ_ACR_NAME }} --query username --output tsv)
+          password_acr=$(az acr credential show -n ${{ env.AZ_ACR_NAME }} --query passwords[0].value --output tsv)
+
+          echo "::add-mask::$url_acr"
+          echo "::add-mask::$login_acr"
+          echo "::add-mask::$password_acr"
+
+          echo "ACR_URL=$url_acr" >> $GITHUB_ENV
+          echo "ACR_LOGIN=$login_acr" >> $GITHUB_ENV
+          echo "ACR_PASSWORD=$password_acr" >> $GITHUB_ENV
+          
+      - name: Docker Login
+        uses: docker/login-action@v1.14.1
+        with:
+          registry: ${{ env.ACR_URL }}
+          username: ${{ env.ACR_LOGIN }}
+          password: ${{ env.ACR_PASSWORD }}
+      
+      - name: Build and push TodoApi image
+        uses: docker/build-push-action@v3
+        with:
+          context: src/ContainerApp.TodoApi
+          file: src/ContainerApp.TodoApi/Dockerfile
+          tags: |
+            ${{ env.ACR_URL }}/containerapp.todoapi:${{ GITHUB.RUN_NUMBER }}
+            ${{ env.ACR_URL }}/containerapp.todoapi:latest
+          push: true
+
+      - name: Build and push WeatherApi image
+        uses: docker/build-push-action@v3
+        with:
+          context: src/ContainerApp.WeatherApi
+          file: src/ContainerApp.WeatherApi/Dockerfile
+          tags: |
+            ${{ env.ACR_URL }}/containerapp.weatherapi:${{ GITHUB.RUN_NUMBER }}
+            ${{ env.ACR_URL }}/containerapp.weatherapi:latest
+          push: true
+          
+      - name: Build and push ContainerApp.WebApp image
+        uses: docker/build-push-action@v3
+        with:
+          context: src/ContainerApp.WebApp
+          file: src/ContainerApp.WebApp/Dockerfile
+          tags: | 
+            ${{ env.ACR_URL }}/containerapp.webapp:${{ GITHUB.RUN_NUMBER }}
+            ${{ env.ACR_URL }}/containerapp.webapp:latest
+          push: true
+      
+      - name: Replace variables
+        run: |
+          echo Build Number = ${{ GITHUB.RUN_NUMBER }}
+          urlApp=${{ env.ACR_URL }}/containerapp.webapp:${{ GITHUB.RUN_NUMBER }}
+          urlTodoApi=${{ env.ACR_URL }}/containerapp.todoapi:${{ GITHUB.RUN_NUMBER }}
+          urlWeatherApi=${{ env.ACR_URL }}/containerapp.weatherapi:${{ GITHUB.RUN_NUMBER }}
+          sqlConnString="Server=tcp:${{ env.AZ_SQLSERVER_NAME }}.database.windows.net,1433;Initial Catalog=TodoItem_DB;Persist Security Info=False;User ID=${{ secrets.AZURE_SQL_USERNAME }};Password=${{ secrets.AZURE_SQL_PASSWORD }};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+
+          echo URL APP = $urlApp
+          echo URL TODO API = $urlTodoApi
+          echo URL WEATHER API = $urlWeatherApi
+
+          echo "*** Replace ContainerApp.WebApp/aro-deployment.yaml ***"
+          sed -i "s|_ImageUrlApp_|$urlApp|g" src/ContainerApp.WebApp/aro-deployment.yaml
+
+          echo "*** Replace ContainerApp.TodoApi/aro-deployment.yaml ***"
+          sed -i "s|_ImageUrlApi_|$urlTodoApi|g" src/ContainerApp.TodoApi/aro-deployment.yaml
+          sed -i "s|_ConnString_|$sqlConnString|g" src/ContainerApp.TodoApi/aro-deployment.yaml
+
+          echo "*** Replace ContainerApp.WeatherApi/aro-deployment.yaml ***"
+          sed -i "s|_ImageUrlApi_|$urlWeatherApi|g" src/ContainerApp.WeatherApi/aro-deployment.yaml
+
+      - name: Upload Kubernetes files
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: k8s
+          path: |
+            src/ContainerApp.WebApp/aro-deployment.yaml
+            src/ContainerApp.TodoApi/aro-deployment.yaml
+            src/ContainerApp.WeatherApi/aro-deployment.yaml
+        
+  release-to-dev:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: DEV
+    steps:
+      - name: Download k8s artifact
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: k8s
+          path: my-app-artifact
+
+      - name: Install CLI tools from OpenShift Mirror
+        uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          source: "mirror"
+          oc: "3"
+
+      # Log into Azure
+      - name: Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set ARO variables
+        id: aro-variables
+        run: |
+          aroApiServer=$(az aro show --name ${{ env.AZ_ARO_NAME }} --resource-group ${{ env.AZ_RG_NAME }} --query "apiserverProfile.url" -o tsv)
+          aroPass=$(az aro list-credentials --name ${{ env.AZ_ARO_NAME }} --resource-group ${{ env.AZ_RG_NAME }} --query "kubeadminPassword" -o tsv)
+
+          echo "::add-mask::$aroApiServer"
+          echo "::add-mask::$aroPass"
+
+          echo "ARO_API_SERVER=$aroApiServer" >> $GITHUB_ENV
+          echo "ARO_API_PASS=$aroPass" >> $GITHUB_ENV
+
+      - name: Log in to OpenShift
+        uses: redhat-actions/oc-login@v1
+        with:
+          openshift_server_url: ${{ env.ARO_API_SERVER }}
+          openshift_username: 'kubeadmin'
+          openshift_password: ${{ env.ARO_API_PASS }}
+          insecure_skip_tls_verify: true
+          namespace: 'default'
+      
+      - name: Set ACR variables
+        run: |
+          url_acr=$(az acr show -n ${{ env.AZ_ACR_NAME }} --query loginServer --output tsv)
+          login_acr=$(az acr credential show -n ${{ env.AZ_ACR_NAME }} --query username --output tsv)
+          password_acr=$(az acr credential show -n ${{ env.AZ_ACR_NAME }} --query passwords[0].value --output tsv)
+
+          echo "::add-mask::$url_acr"
+          echo "::add-mask::$login_acr"
+          echo "::add-mask::$password_acr"
+
+          echo "ACR_URL=$url_acr" >> $GITHUB_ENV
+          echo "ACR_LOGIN=$login_acr" >> $GITHUB_ENV
+          echo "ACR_PASSWORD=$password_acr" >> $GITHUB_ENV
+      
+      - name: Create ACR Secret
+        run: |
+          if [ $(oc get secret acr-secret --ignore-not-found) = false ]; then
+            oc create secret docker-registry --docker-server=${{ env.ACR_URL }} --docker-username=${{ env.ACR_LOGIN }} --docker-password=${{ env.ACR_PASSWORD }} --docker-email=unused acr-secret
+          else
+            echo "Secrete already exists"
+          fi
+
+      - name: Apply Deployment
+        run: |
+          oc apply -f my-app-artifact/ContainerApp.WebApp/aro-deployment.yaml
+          oc apply -f my-app-artifact/ContainerApp.TodoApi/aro-deployment.yaml
+          oc apply -f my-app-artifact/ContainerApp.WeatherApi/aro-deployment.yaml

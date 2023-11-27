@@ -12,7 +12,32 @@ choco install kubernetes-helm
 helm repo add stable https://charts.helm.sh/stable
 az aks get-credentials --resource-group terraform-aks-dev --name terraform-aks-dev-cluster
 
+#service principal already added to acr
+sudo docker login poc12378acr.azurecr.io --username 0cafbfb9-31b5-4c20-b40f-1ad251ee2dc7 --password T4t8Q~Y2TsB0j-YAZ3Kw2uimS56lNO_nRJc0wcXK
 
+
+cd ~
+cd /home/priyanko/dotnet-container-app-main/src/ContainerApp.TodoApi
+sudo docker build -t poc12378acr.azurecr.io/containerapptodoapi -f Dockerfile .
+sudo docker push poc12378acr.azurecr.io/containerapptodoapi
+
+cd ~
+cd /home/priyanko/dotnet-container-app-main/src/ContainerApp.WeatherApi
+sudo docker build -t poc12378acr.azurecr.io/containerappweatherapi -f Dockerfile .
+sudo docker push poc12378acr.azurecr.io/containerappweatherapi
+
+cd ~
+cd /home/priyanko/dotnet-container-app-main/src/ContainerApp.WebApp
+sudo docker build -t poc12378acr.azurecr.io/containerappwebapp -f Dockerfile .
+sudo docker push poc12378acr.azurecr.io/containerappwebapp
+
+
+az login
+az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
+kubectl apply -f k8s-deployment.yaml
 ======================================================================
 June 6 2020
 --------------

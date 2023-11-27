@@ -1,0 +1,33 @@
+# Command Line to run bicep files
+
+az login --use-device-code
+
+az account list -o table
+
+az account set --subscription <subscriptionId>
+
+az account list-locations -o table
+
+az vm list-sizes --location "brazilsouth"
+
+$rgName = 'rg-ContainerApp'
+$location ='brazilsouth'
+$acrName = 'crcontainerapp'
+$aksName = 'aks-containerapp'
+$clusterName = 'akstesteleandro'
+$sqlserverName = 'sqlserverteste'
+$kvName = 'kvteste'
+
+az group create --name $rgName --location $location
+
+az group list -o table
+
+# Testing
+az bicep build --file .\aspnetcoreiaac\main.bicep
+
+# Running AKS
+az deployment group create --resource-group $rgName --template-file .\ContainerApp.IAC\main.bicep --parameters acrName=$acrName clusterName=$clusterName sqlserverName=$sqlserverName kvName=$kvName
+
+# Running ARO
+https://learn.microsoft.com/en-us/azure/openshift/quickstart-openshift-arm-bicep-template?pivots=aro-bicep
+az deployment group create --resource-group $rgName --template-file .\ContainerApp.IAC\aro.bicep --parameters acrName=$acrName clusterName=$clusterName aadClientId=$SP_CLIENT_ID aadClientSecret=$SP_CLIENT_SECRET aadObjectId=$SP_OBJECT_ID rpObjectId=$ARO_RP_SP_OBJECT_ID
