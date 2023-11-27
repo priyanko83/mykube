@@ -1,17 +1,5 @@
 1. Get yourself added to admin AD group
 
-2. Create new acr connection by adding docker push task
-a8ef7400-5409-4d49-b620-6376d68107bb
-
-3. Create new environment: 'priyanko83mykube-xxxx.default' by adding a deploy k8s task
-
-Troubleshooting
-kubectl describe pod shoppingapi-deployment-6bbc8d758-r68x4 -n default
-
-choco install kubernetes-helm
-helm repo add stable https://charts.helm.sh/stable
-az aks get-credentials --resource-group terraform-aks-dev --name terraform-aks-dev-cluster
-
 #service principal already added to acr
 sudo docker login poc12378acr.azurecr.io --username 0cafbfb9-31b5-4c20-b40f-1ad251ee2dc7 --password T4t8Q~Y2TsB0j-YAZ3Kw2uimS56lNO_nRJc0wcXK
 
@@ -35,9 +23,19 @@ sudo docker push poc12378acr.azurecr.io/containerappwebapp
 az login
 az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-
 az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
+
+
+cd D:\MyCode\kuberoot\mykube\Create-AKS-NodePools-using-Terraform\src\dotnet-container-app-main\src\ContainerApp.WeatherApi
 kubectl apply -f k8s-deployment.yaml
+
+
+cd D:\MyCode\kuberoot\mykube\Create-AKS-NodePools-using-Terraform\src\dotnet-container-app-main\src\ContainerApp.WebApp
+kubectl apply -f k8s-deployment.yaml
+
+cd D:\MyCode\kuberoot\mykube\Create-AKS-NodePools-using-Terraform\src\dotnet-container-app-main\src\ContainerApp.TodoApi
+kubectl apply -f k8s-deployment.yaml
+
 ======================================================================
 June 6 2020
 --------------
