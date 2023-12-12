@@ -9,7 +9,7 @@
 # .tfstate files
 *.tfstate
 *.tfstate.*
-
+*.exe
 
 # User-specific files
 *.rsuser

@@ -1,6 +1,6 @@
 1. Get yourself added to admin AD group
 
-#service principal already added to acr
+#below service principal already added to acr
 sudo docker login poc12378acr.azurecr.io --username 0cafbfb9-31b5-4c20-b40f-1ad251ee2dc7 --password T4t8Q~Y2TsB0j-YAZ3Kw2uimS56lNO_nRJc0wcXK
 
 
