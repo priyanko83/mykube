@@ -1,3 +1,10 @@
+az login
+az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
+
+cd D:\MyCode\kuberoot\mykube\Create-AKS-NodePools-using-Terraform
+
 1. Get yourself added to admin AD group
 
 #below service principal already added to acr
@@ -18,12 +25,6 @@ cd ~
 cd /home/priyanko/dotnet-container-app-main/src/ContainerApp.WebApp
 sudo docker build -t poc12378acr.azurecr.io/containerappwebapp -f Dockerfile .
 sudo docker push poc12378acr.azurecr.io/containerappwebapp
-
-
-az login
-az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
 
 
 cd D:\MyCode\kuberoot\mykube\Create-AKS-NodePools-using-Terraform\src\dotnet-container-app-main\src\ContainerApp.WeatherApi
