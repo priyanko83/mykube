@@ -32,7 +32,8 @@ eshopRegistry=${ESHOP_REGISTRY}
 appPrefix="eshoplearn"
 chartsFolder="./helm-simple"
 defaultRegistry="poc12378acr.azurecr.io"
-hostName="http://40.118.229.35"
+hostName="20.66.60.79"
+hostIp="20.66.60.79"
 protocol="http"
 certificate="self-signed"
 useHostName=true
@@ -46,7 +47,7 @@ then
 
     echo
     echo "Deploying a development self-signed certificate"
-
+    
     ./deploy-secrets.sh
 fi
 

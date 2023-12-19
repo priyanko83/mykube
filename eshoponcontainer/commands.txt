@@ -1,4 +1,4 @@
-az login
+az login --service-principal -t 38857842-8570-4fcf-870b-b7aa1fcddf06 -u 0cafbfb9-31b5-4c20-b40f-1ad251ee2dc7 -p T4t8Q~Y2TsB0j-YAZ3Kw2uimS56lNO_nRJc0wcXK
 az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
 az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
 cd D:\MyCode\kuberoot\mykube\eshoponcontainer\deploy\k8s\ingress-controller
@@ -7,7 +7,7 @@ kubectl apply -f nginx-controller.yaml
 cd ~
 cd /home/priyanko/MyCode/eShop/deploy/k8s
 
-az login
+az login --service-principal -t 38857842-8570-4fcf-870b-b7aa1fcddf06 -u 0cafbfb9-31b5-4c20-b40f-1ad251ee2dc7 -p T4t8Q~Y2TsB0j-YAZ3Kw2uimS56lNO_nRJc0wcXK
 az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
 az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
 sudo docker login poc12378acr.azurecr.io --username 0cafbfb9-31b5-4c20-b40f-1ad251ee2dc7 --password T4t8Q~Y2TsB0j-YAZ3Kw2uimS56lNO_nRJc0wcXK
@@ -18,6 +18,7 @@ chmod +x ./quickstart.sh
 chmod +x ./theme.sh
 chmod +x ./deploy-secrets.sh
 chmod +x ./deploy-application.sh
+chmod +x ./certificates/create-self-signed-certificate.sh
 
 ./build-to-acr.sh
 ./quickstart.sh
