@@ -20,6 +20,8 @@ chmod +x ./deploy-secrets.sh
 chmod +x ./deploy-application.sh
 chmod +x ./certificates/create-self-signed-certificate.sh
 
-./build-to-acr.sh
 ./quickstart.sh
 
+kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
+kubectl apply -f nginx-controller.yaml  --namespace ingress-nginx
+kubectl delete -f nginx-controller.yaml  --namespace ingress-nginx

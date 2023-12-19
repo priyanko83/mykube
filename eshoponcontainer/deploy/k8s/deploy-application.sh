@@ -32,12 +32,12 @@ eshopRegistry=${ESHOP_REGISTRY}
 appPrefix="eshoplearn"
 chartsFolder="./helm-simple"
 defaultRegistry="poc12378acr.azurecr.io"
-hostName="20.66.60.79"
-hostIp="20.66.60.79"
+hostIp="20.66.11.123"
+hostName=$hostIp
 protocol="http"
 certificate="self-signed"
-useHostName=true
-
+useHostName=false
+deployNamespace="ingress-nginx"
 
 if [ "$certificate" == "self-signed" ]
 then
@@ -59,7 +59,7 @@ then
     if [ "$installedCharts" != "" ]
     then
         echo "Uninstalling Helm charts..."
-        helmCmd="helm delete $installedCharts"
+        helmCmd="helm delete $installedCharts --namespace $deployNamespace"
         echo "${newline} > ${genericCommandStyle}$helmCmd${defaultTextStyle}${newline}"
         eval $helmCmd
     fi
@@ -73,7 +73,7 @@ else
         then
             echo
             echo "Uninstalling chart ""$chart""..."
-            helmCmd="helm delete $installedChart"
+            helmCmd="helm delete $installedChart --namespace $deployNamespace"
             echo "${newline} > ${genericCommandStyle}$helmCmd${defaultTextStyle}${newline}"
             eval $helmCmd
         fi
@@ -88,7 +88,7 @@ for chart in $chartList
 do
     echo
     echo "Installing chart \"$chart\"..."
-    helmCmd="helm install eshoplearn-$chart \"$chartsFolder/$chart\" --set registry=$registry --set imagePullPolicy=Always --set useHostName=$useHostName --set host=$hostName --set protocol=$protocol"
+    helmCmd="helm install eshoplearn-$chart \"$chartsFolder/$chart\"  --namespace $deployNamespace --set registry=$registry --set imagePullPolicy=Always --set useHostName=$useHostName --set host=$hostName --set protocol=$protocol"
     echo "${newline} > ${genericCommandStyle}$helmCmd${defaultTextStyle}${newline}"
     eval $helmCmd
 done
