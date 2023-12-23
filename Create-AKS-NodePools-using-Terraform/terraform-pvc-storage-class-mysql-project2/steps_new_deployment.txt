@@ -3,7 +3,8 @@ az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
 
-cd D:\MyCode\kuberoot\mykube\Create-AKS-NodePools-using-Terraform\terraform-nginx-routing-pvc-project2
+cd D:\MyCode\kuberoot\mykube\Create-AKS-NodePools-using-Terraform\terraform-pvc-storage-class-mysql-project2
+
 
 terraform init -upgrade
 terraform apply --auto-approve

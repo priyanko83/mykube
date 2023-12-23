@@ -23,5 +23,5 @@ chmod +x ./certificates/create-self-signed-certificate.sh
 ./quickstart.sh
 
 kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
-kubectl apply -f nginx-controller.yaml  --namespace ingress-nginx
-kubectl delete -f nginx-controller.yaml  --namespace ingress-nginx
+kubectl apply -f ./ingress-controller/nginx-controller.yaml  --namespace ingress-nginx
+kubectl delete -f ./ingress-controller/nginx-controller.yaml  --namespace ingress-nginx
