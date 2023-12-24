@@ -1,3 +1,4 @@
+
 resource "kubernetes_namespace" "ingress" {  
   metadata {
     name = "nginx-ingress"
@@ -11,6 +12,9 @@ resource "helm_release" "ingress" {
   chart      = "ingress-nginx"
   version    = "4.5.2"
   namespace  = kubernetes_namespace.ingress.metadata.0.name
+  values = [
+    file("ingress-controller/nginx-controller.yaml")
+  ]
   depends_on = [
     kubernetes_namespace.ingress
   ]
