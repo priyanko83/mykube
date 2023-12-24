@@ -120,14 +120,6 @@ resource "azurerm_role_assignment" "acr_pull" {
   skip_service_principal_aad_check = true
 }
 
-#https://github.com/learnk8s/terraform-aks/blob/master/03-aks-helm/main.tf
-provider "helm" {
-  version = ">= 2.1.0"
-  kubernetes {
-    config_path = "~/.kube/config"
-  }
-}
-
 output "kube_config" {
   value = azurerm_kubernetes_cluster.aks_cluster.kube_config_raw
   sensitive = true
