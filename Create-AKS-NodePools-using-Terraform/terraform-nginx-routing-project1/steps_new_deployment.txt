@@ -10,3 +10,10 @@ terraform apply --auto-approve
 terraform destroy --auto-approve
 
 
+kubectl apply -f namespace.yaml
+kubectl apply -f demo-route-app/  --namespace project1-ns --recursive
+
+#VERY IMPORTANT: Delete these else they will incure significant cost
+kubectl delete -f demo-route-app/  --namespace project2-ns --recursive
+kubectl delete -f namespace.yaml
+

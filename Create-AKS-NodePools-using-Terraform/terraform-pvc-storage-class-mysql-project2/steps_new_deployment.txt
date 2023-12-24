@@ -1,6 +1,5 @@
-az login
+az login 
 az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
 
 cd D:\MyCode\kuberoot\mykube\Create-AKS-NodePools-using-Terraform\terraform-pvc-storage-class-mysql-project2
@@ -11,5 +10,9 @@ terraform apply --auto-approve
 terraform destroy --auto-approve
 
 
-kubectl apply -f kube-manifests/  --namespace project2pvc-namespace --recursive
-kubectl delete -f kube-manifests/  --namespace project2pvc-namespace --recursive
+kubectl apply -f namespace.yaml
+kubectl apply -f kube-manifests/  --namespace project2-ns --recursive
+
+#VERY IMPORTANT: Delete these else they will incure significant cost
+kubectl delete -f kube-manifests/  --namespace project2-ns --recursive
+kubectl delete -f namespace.yaml
