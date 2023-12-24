@@ -20,6 +20,10 @@ terraform {
       source  = "hashicorp/azuread"
       version = "~> 2.0"
     }
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 2.1.0"
+    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.0"
@@ -47,8 +51,9 @@ provider "azurerm" {
   }
 }
 
-# 3. Terraform Resource Block: Define a Random Pet Resource
-resource "random_pet" "aksrandom" {
-
+provider "helm" {
+    kubernetes {
+      config_path = "~/.kube/config"
+  }
 }
 

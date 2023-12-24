@@ -122,7 +122,7 @@ resource "azurerm_role_assignment" "acr_pull" {
 
 #https://github.com/learnk8s/terraform-aks/blob/master/03-aks-helm/main.tf
 provider "helm" {
-  version = "1.2.2"
+  version = ">= 2.1.0"
   kubernetes {
     config_path = "~/.kube/config"
   }
