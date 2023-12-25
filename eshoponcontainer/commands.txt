@@ -12,6 +12,7 @@ az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
 az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
 sudo docker login poc12378acr.azurecr.io --username 0cafbfb9-31b5-4c20-b40f-1ad251ee2dc7 --password T4t8Q~Y2TsB0j-YAZ3Kw2uimS56lNO_nRJc0wcXK
 
+
 chmod +x ./azure-cli-check.sh
 chmod +x ./build-to-acr.sh
 chmod +x ./quickstart.sh
@@ -20,11 +21,13 @@ chmod +x ./deploy-secrets.sh
 chmod +x ./deploy-application.sh
 chmod +x ./certificates/create-self-signed-certificate.sh
 
-kubectl apply -f ./ingress-controller/nginx-controller.yaml  --namespace ingress-nginx
+#use only if required to build
+./build-to-acr.sh
+
+
+kubectl apply -f ./ingress-controller/nginx-controller.yaml  
 ./quickstart.sh
 
-kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
-kubectl apply -f ./ingress-controller/nginx-controller.yaml  --namespace ingress-nginx
 kubectl delete -f ./ingress-controller/nginx-controller.yaml  --namespace ingress-nginx
 
 #use if required to build
