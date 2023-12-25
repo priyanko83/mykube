@@ -54,11 +54,10 @@ then
     ./deploy-secrets.sh
 fi
 
-mv deploy-application-exports.txt ../..
-
 if [ "$charts" == "" ]
 then
-    installedCharts=$(helm list -qf $appPrefix-)
+    installedCharts=$(helm list --all-namespaces -qf $appPrefix-)
+    echo "Charts : $installedCharts"
     if [ "$installedCharts" != "" ]
     then
         echo "Uninstalling Helm charts..."

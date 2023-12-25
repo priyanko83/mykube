@@ -24,11 +24,11 @@ chmod +x ./certificates/create-self-signed-certificate.sh
 #use only if required to build
 ./build-to-acr.sh
 
-
+kubectl delete -f ./ingress-controller/nginx-controller.yaml  --namespace eshop-ns
 kubectl apply -f ./ingress-controller/nginx-controller.yaml  
 ./quickstart.sh
 
-kubectl delete -f ./ingress-controller/nginx-controller.yaml  --namespace ingress-nginx
+
 
 #use if required to build
 ./build-to-acr.sh
