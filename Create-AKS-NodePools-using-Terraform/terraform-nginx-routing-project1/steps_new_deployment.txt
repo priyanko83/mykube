@@ -5,15 +5,10 @@ az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-
 
 cd D:\MyCode\kuberoot\mykube\Create-AKS-NodePools-using-Terraform\terraform-nginx-routing-project1
 
-terraform init -upgrade
-terraform apply --auto-approve
-terraform destroy --auto-approve
-
-
 kubectl apply -f namespace.yaml
-kubectl apply -f demo-route-app/  --namespace project1-ns --recursive
+kubectl apply -f demo-route-app/  --namespace ingress-nginx --recursive
 
-#VERY IMPORTANT: Delete these else they will incure significant cost
-kubectl delete -f demo-route-app/  --namespace project2-ns --recursive
 kubectl delete -f namespace.yaml
+kubectl apply -f nginx-controller.yaml
 
+#DO NOT try to install nginx via terraform automation. Creates lot of issues.

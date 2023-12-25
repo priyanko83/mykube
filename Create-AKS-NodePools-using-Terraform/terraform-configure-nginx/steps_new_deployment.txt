@@ -1,0 +1,10 @@
+az login
+az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
+
+cd D:\MyCode\kuberoot\mykube\Create-AKS-NodePools-using-Terraform\terraform-configure-nginx\ingress-controller
+
+kubectl apply -f nginx-controller.yaml
+
+#DO NOT try to install nginx via terraform automation. Creates lot of issues.
