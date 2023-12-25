@@ -6,7 +6,7 @@ az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-
 cd D:\MyCode\kuberoot\mykube\Create-AKS-NodePools-using-Terraform\terraform-nginx-routing-project1
 
 kubectl apply -f namespace.yaml
-kubectl apply -f demo-route-app/  --namespace ingress-nginx --recursive
+kubectl apply -f demo-route-app/  --namespace project1-ns --recursive
 
 kubectl delete -f namespace.yaml
 kubectl apply -f nginx-controller.yaml
