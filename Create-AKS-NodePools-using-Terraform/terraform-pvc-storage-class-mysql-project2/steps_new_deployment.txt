@@ -5,14 +5,11 @@ az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-
 cd D:\MyCode\kuberoot\mykube\Create-AKS-NodePools-using-Terraform\terraform-pvc-storage-class-mysql-project2
 
 
-terraform init -upgrade
-terraform apply --auto-approve
-terraform destroy --auto-approve
-
-
 kubectl apply -f namespace.yaml
+kubectl apply -f nginx-controller.yaml
 kubectl apply -f kube-manifests/  --namespace project2-ns --recursive
 
-#VERY IMPORTANT: Delete these else they will incure significant cost
-kubectl delete -f kube-manifests/  --namespace project2-ns --recursive
 kubectl delete -f namespace.yaml
+
+
+#DO NOT try to install nginx via terraform automation. Creates lot of issues.
