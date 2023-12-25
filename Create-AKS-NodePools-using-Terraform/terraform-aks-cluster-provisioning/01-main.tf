@@ -55,6 +55,12 @@ provider "azurerm" {
   }
 }
 
+provider "helm" {
+  kubernetes {
+    config_path = "~/.kube/config"
+  }
+}
+
 # 3. Terraform Resource Block: Define a Random Pet Resource
 resource "random_pet" "aksrandom" {
 
