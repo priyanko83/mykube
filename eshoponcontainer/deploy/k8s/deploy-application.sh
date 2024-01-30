@@ -32,7 +32,7 @@ eshopRegistry=${ESHOP_REGISTRY}
 appPrefix="eshoplearn"
 chartsFolder="./helm-simple"
 defaultRegistry="poc12378acr.azurecr.io"
-hostIp=$(kubectl get services --namespace eshop-ns ingress-nginx-controller --output jsonpath='{.status.loadBalancer.ingress[0].ip}')
+hostIp=$(kubectl get services --namespace ingress-nginx ingress-nginx-controller --output jsonpath='{.status.loadBalancer.ingress[0].ip}')
 echo "Printing hostIp"
 echo $hostIp
 #hostIp="104.40.94.128"

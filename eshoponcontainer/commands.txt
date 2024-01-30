@@ -26,6 +26,8 @@ chmod +x ./certificates/create-self-signed-certificate.sh
 
 kubectl delete -f ./ingress-controller/nginx-controller.yaml  --namespace eshop-ns
 kubectl apply -f ./ingress-controller/nginx-controller.yaml  
+
+#create namespace  eshop-ns
 ./quickstart.sh
 
 
