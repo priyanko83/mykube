@@ -1,7 +1,5 @@
 resources:
     - monitoring-namespace.yaml
-    - prometheus-pv-nfs.yaml
-    - prometheus-pvc-nfs.yaml
     - prometheus-cluster-role.yaml
     - prometheus-config.yaml
     - prometheus-deployment.yaml

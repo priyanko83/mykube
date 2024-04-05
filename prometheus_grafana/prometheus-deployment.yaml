@@ -47,5 +47,4 @@ spec:
             name: prometheus-config
 
       - name: prometheus-storage-volume
-        persistentVolumeClaim:
-            claimName: pvc-nfs-data
+        emptyDir: {}
