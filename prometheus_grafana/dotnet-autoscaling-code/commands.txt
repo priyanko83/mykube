@@ -1,0 +1,23 @@
+az login
+az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
+az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
+cd D:\MyCode\eshop_reference_code\mslearn-microservices-devops-aspnet-core-main\deploy\k8s\ingress-controller
+kubectl apply -f nginx-controller.yaml
+
+
+az login --service-principal -u 745395ae-a277-4b78-9d6d-afd9c4680525 -p .AdG1DRSeXcqQSBbE2dJJbg6PZsM.?7] --tenant 38857842-8570-4fcf-870b-b7aa1fcddf06
+az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
+----------------------
+cd ~
+cd /home/priyanko/MyCode/dotnet-autoscaling-code/DemoApi
+
+az login
+az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
+az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
+sudo docker login poc12378acr.azurecr.io --username 0cafbfb9-31b5-4c20-b40f-1ad251ee2dc7 --password T4t8Q~Y2TsB0j-YAZ3Kw2uimS56lNO_nRJc0wcXK
+
+
+
+sudo docker build -t poc12378acr.azurecr.io/hpametrics:v1 -f Dockerfile .
+sudo docker push poc12378acr.azurecr.io/hpametrics:v1
+kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
