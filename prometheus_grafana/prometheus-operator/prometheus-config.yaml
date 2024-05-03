@@ -138,3 +138,12 @@ data:
         - source_labels: [__meta_kubernetes_service_name]
           action: replace
           target_label: kubernetes_name
+
+      - job_name: hpademometrics  
+        scrape_interval: 15s  
+        scrape_timeout: 10s  
+        metrics_path: /metrics  
+        scheme: http  
+        static_configs:  
+        - targets: ['demoapi-service:8080']
+
