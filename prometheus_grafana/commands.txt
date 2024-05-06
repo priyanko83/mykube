@@ -20,7 +20,18 @@ sudo docker login poc12378acr.azurecr.io --username 0cafbfb9-31b5-4c20-b40f-1ad2
 
 sudo docker build -t poc12378acr.azurecr.io/hpametrics:v1 -f Dockerfile .
 sudo docker push poc12378acr.azurecr.io/hpametrics:v1
-kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
+kubectl apply -f C:\MyCode\rootk8s\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
+
+
+kubectl delete -f C:\MyCode\rootk8s\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
+kubectl delete -f  C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-adapter\ -n monitoring
+kubectl delete -k C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-operator\ -n monitoring
+kubectl delete -k C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-operator\Grafana\ -n monitoring
+
+kubectl apply -f C:\MyCode\rootk8s\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
+kubectl apply -f  C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-adapter\ -n monitoring
+kubectl apply -k C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-operator\ -n monitoring
+kubectl apply -k C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-operator\Grafana\ -n monitoring
 
 
 kubectl delete -f D:\MyCode\kuberoot\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
