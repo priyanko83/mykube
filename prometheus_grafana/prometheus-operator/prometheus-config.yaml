@@ -145,5 +145,5 @@ data:
         metrics_path: /metrics  
         scheme: http  
         static_configs:  
-        - targets: ['demoapi-service:8080']
+        - targets: ['demoapi-service:8000']
 
