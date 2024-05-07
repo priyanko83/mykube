@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/name: prometheus-adapter
     app.kubernetes.io/version: 0.11.2
   name: resource-metrics-auth-reader
-  namespace: kube-system
+  namespace: monitoring
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role

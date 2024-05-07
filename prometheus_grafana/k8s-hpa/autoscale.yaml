@@ -14,4 +14,4 @@ spec:
   - type: Pods
     pods:
       metricName: request_duration_seconds_avg
-      targetAverageValue: 1000
+      targetAverageValue: 500

@@ -39,7 +39,8 @@ kubectl delete -f  D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapt
 kubectl delete -k D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\ -n monitoring
 kubectl delete -k D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\Grafana\ -n monitoring
 
-kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
-kubectl apply -f  D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\ -n monitoring
 kubectl apply -k D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\ -n monitoring
+kubectl apply -f  D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\ -n monitoring
+kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
+
 kubectl apply -k D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\Grafana\ -n monitoring
