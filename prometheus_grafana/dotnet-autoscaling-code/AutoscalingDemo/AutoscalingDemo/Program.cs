@@ -18,7 +18,7 @@ namespace AutoscalingDemo
             stopwatch.Start();
 
             // replace XXX with your URL
-            var stringTask = Client.GetStringAsync("http://40.78.100.163:8000/weatherforecast");
+            var stringTask = Client.GetStringAsync("http://40.118.160.51:8000/weatherforecast");
             var message = await stringTask;
 
             stopwatch.Stop();
@@ -33,7 +33,7 @@ namespace AutoscalingDemo
 
         public static void Main()
         {
-            for (var i = 0; i < 5; i++)
+            for (var i = 0; i < 25; i++)
             {
                 var thread = new Thread(SendRequest);
                 thread.Start();

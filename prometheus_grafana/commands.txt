@@ -44,3 +44,6 @@ kubectl apply -f  D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapte
 kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
 
 kubectl apply -k D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\Grafana\ -n monitoring
+
+kubectl get --raw "/apis/metrics.k8s.io/v1beta1"
+kubectl get --raw "/apis/metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/request_duration_seconds_avg" | jq .
