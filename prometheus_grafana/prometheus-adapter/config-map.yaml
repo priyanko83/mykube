@@ -2,12 +2,12 @@ apiVersion: v1
 data:
   config.yaml: |
     rules:
-    - seriesQuery: '{__name__=~"request_duration_seconds_.*",namespace!="",pod!=""}'
+    - seriesQuery: 'request_duration_seconds'
       resources:
         overrides:
-          kubernetes_namespace:
+          namespace:
             resource: namespace
-          kubernetes_pod_name:
+          pod:
             resource: pod
       name:
         matches: "^(.*)"
