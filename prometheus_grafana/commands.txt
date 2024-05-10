@@ -48,3 +48,9 @@ kubectl apply -k D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operato
 
 kubectl get --raw "/apis/metrics.k8s.io/v1beta1" | jq.
 kubectl get --raw "/apis/metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/request_duration_seconds_avg" | jq .
+
+helm uninstall my-prometheus-adapter
+
+helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
+kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/request_duration_seconds_avg" | jq .
