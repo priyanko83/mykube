@@ -18,7 +18,7 @@ namespace AutoscalingDemo
             stopwatch.Start();
 
             // replace XXX with your URL
-            var stringTask = Client.GetStringAsync("http://40.118.160.51:8000/weatherforecast");
+            var stringTask = Client.GetStringAsync("http://13.91.16.142:8000/weatherforecast");
             var message = await stringTask;
 
             stopwatch.Stop();
