@@ -33,7 +33,7 @@ customLabels: {}
 prometheus:
   # Value is templated
   url: http://prometheus-service.monitoring.svc
-  port: 9090
+  port: 80
   path: ""
 
 replicas: 1
@@ -142,7 +142,7 @@ rules:
         pod:
           resource: pod
     seriesFilters: []
-    seriesQuery: 'request_duration_seconds'
+    seriesQuery: 'request_duration_seconds_sum'
 
 service:
   annotations: {}

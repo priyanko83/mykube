@@ -36,7 +36,7 @@ kubectl apply -k C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-operator
 
 
 kubectl delete -f D:\MyCode\kuberoot\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
-helm uninstall my-prometheus-adapter
+helm uninstall my-prometheus-adapter  -n monitoring
 kubectl delete -k D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\ -n monitoring
 
 kubectl delete -k D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\Grafana\ -n monitoring
@@ -51,8 +51,14 @@ kubectl apply -k D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operato
 kubectl get --raw "/apis/metrics.k8s.io/v1beta1" | jq.
 kubectl get --raw "/apis/metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/request_duration_seconds_avg" | jq .
 
-helm uninstall my-prometheus-adapter
+helm uninstall my-prometheus-adapter -n monitoring
+helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
+
 
 helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
 kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1
 kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/request_duration_seconds_avg" | jq .
+
+
+helm uninstall my-prometheus-adapter -n default
+helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n default
