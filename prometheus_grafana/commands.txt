@@ -60,5 +60,14 @@ kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1
 kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/request_duration_seconds_avg" | jq .
 
 
-helm uninstall my-prometheus-adapter -n default
-helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n default
+kubectl logs --since=6h my-prometheus-adapter-56b977d966-5wr46 -n monitoring
+
+
+kubectl exec -n monitoring demoapi-deployment-5fc5fffc64-7pc4t  -it -- /bin/sh
+apt update
+apt install wget
+
+
+wget -O - http://prometheus-service.monitoring.svc
+wget -O - http://prometheus-service.monitoring.svc.cluster.local
+wget -O - http://prometheus-service.monitoring.svc/api/v1/series?match[]=request_duration_seconds_sum
