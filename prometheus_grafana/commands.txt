@@ -60,26 +60,26 @@ helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:
 kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1
 kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/request_duration_seconds_avg" | jq .
 
+## Use selector to resolve pod name, view pod logs
+$POD=kubectl get pods --selector=app.kubernetes.io/instance=my-prometheus-adapter -o jsonpath='{.items[0].metadata.name}' -n monitoring 
+kubectl logs --since=6m $POD -n monitoring
 
-kubectl logs --since=6m my-prometheus-adapter-5bd85795cb-7fxzt -n monitoring
-kubectl logs --since=6m prometheus-784f6f8464-pvk2n -n monitoring
-
-
+## Use appname to enter pod shell
 $POD=kubectl get pods -l app=demoapi -o jsonpath='{.items[0].metadata.name}' -n monitoring 
 kubectl exec -n monitoring $POD  -it -- /bin/sh
 
+seq 1 20 | xargs -n1 -P20  wget  "http://demoapi-service:8000/weatherforecast"
 
-for i in {1..42}
-do
-    wget "http://demoapi-service:8000/weatherforecast" &
-done
 
-wget -O - http://demoapi-service:8000/weatherforecast
+wget -O - http://demoapi-service:8000/metrics
 wget -O - http://prometheus-service.monitoring.svc
 wget -O - http://prometheus-service.monitoring.svc.cluster.local
 wget -O - http://prometheus-service.monitoring.svc/api/v1/series?match[]=request_duration_seconds_sum
 
-
+# other useful stuff
+kubectl get pods --selector=label=app.kubernetes.io/instance=my-prometheus-adapter -n monitoring
 
 apt update
-apt install wget
+apt install curl
+seq 1 20 | xargs -n1 -P20  curl  "http://demoapi-service:8000/weatherforecast"
+
