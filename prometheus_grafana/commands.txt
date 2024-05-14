@@ -37,6 +37,10 @@ kubectl apply -f C:\MyCode\rootk8s\mykube\prometheus_grafana\dotnet-autoscaling-
 kubectl delete -k C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-operator\Grafana\ -n monitoring
 kubectl apply -k C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-operator\Grafana\ -n monitoring
 
+helm uninstall my-prometheus-adapter -n monitoring
+helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
+
+
 
 kubectl delete -f D:\MyCode\kuberoot\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
 helm uninstall my-prometheus-adapter  -n monitoring
@@ -60,7 +64,7 @@ helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:
 
 helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
 kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1
-kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/request_duration_seconds_avg" | jq .
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/my_custom_metric" | jq .
 
 ## Use selector to resolve pod name, view pod logs
 $POD=kubectl get pods --selector=app.kubernetes.io/instance=my-prometheus-adapter -o jsonpath='{.items[0].metadata.name}' -n monitoring 
@@ -85,3 +89,4 @@ apt update
 apt install curl
 seq 1 20 | xargs -n1 -P20  curl  "http://demoapi-service:8000/weatherforecast"
 
+wget -O - http://prometheus-service.monitoring.svc:80/api/v1/series?match%5B%5D=%7B__name__%3D~%22request_duration_seconds_sum%22%7D&start=1715682195.459
