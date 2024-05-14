@@ -30,7 +30,7 @@ kind: Service
 metadata:
   name: demoapi-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: demoapi
   ports:
