@@ -8,7 +8,7 @@ image:
   tag: ""
   pullPolicy: IfNotPresent
 
-logLevel: 10
+logLevel: 6
 
 metricsRelistInterval: 1m
 
@@ -131,17 +131,15 @@ startupProbe: {}
 rules:
   default: false
   custom:
-  - seriesQuery: '{__name__=~"request_duration_seconds_sum"}'
+  - seriesQuery: '{__name__=~"request_duration_seconds_bucket"}'
     name:
-      as: "my_custom_metric"
-      matches: "(.*)"
+      as: "{1}_custom_metric"
+      matches: "^(.*)_bucket$"
     resources:
       overrides:
-        namespace:
-          resource: namespace
-        pod:
-          resource: pod
-    metricsQuery: 'request_duration_seconds_sum{job="hpademometrics", status_code="200"}'
+        namespace: {resource: "namespace"}
+        pod: {resource: "pod"}
+    metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>})) by (<<.GroupBy>>)'
      
 service:
   annotations: {}
