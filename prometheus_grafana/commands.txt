@@ -92,4 +92,15 @@ seq 1 20 | xargs -n1 -P20  curl  "http://demoapi-service:8000/weatherforecast"
 wget -O - http://prometheus-service.monitoring.svc:80/api/v1/series?match%5B%5D=%7B__name__%3D~%22request_duration_seconds_sum%22%7D&start=1715682195.459
 curl 
  kubectl delete apiservice v1beta1.custom.metrics.k8s.io  -n monitoring
- kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\components_latest.yaml 
+ kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\components_latest.yaml
+
+helm uninstall my-prometheus-adapter -n monitoring
+helm install mon --namespace monitoring prometheus-community/kube-prometheus-stack
+kubectl --namespace monitoring get pods -l "release=mon"
+
+
+https://github.com/infracloudio/kubernetes-autoscaling/tree/master
+kubectl port-forward svc/mon-grafana 80:80 -n monitoring
+
+admin
+prom-operator
