@@ -103,6 +103,10 @@ helm install mon --namespace monitoring prometheus-community/kube-prometheus-sta
 kubectl --namespace monitoring get pods -l "release=mon"
 
 
+helm uninstall my-prometheus-adapter -n monitoring
+helm uninstall mon -n monitoring
+
+
 https://github.com/infracloudio/kubernetes-autoscaling/tree/master
 kubectl port-forward svc/my-prometheus-operator-kub-prometheus 9090 --namespace monitoring
 kubectl port-forward svc/mon-grafana 80:80 -n monitoring
