@@ -11,6 +11,6 @@ rules:
       as: "my_custom_metric"      
     resources:
       overrides:
-        namespace: {resource: "namespace"}
-        pod: {resource: "pod"}
+        kubernetes_namespace: {resource: "namespace"}
+        kubernetes_pod_name: {resource: "pod"}
     metricsQuery: 'request_duration_seconds_bucket'

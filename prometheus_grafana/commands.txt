@@ -112,6 +112,8 @@ helm install mon --namespace monitoring prometheus-community/kube-prometheus-sta
 helm uninstall my-prometheus-adapter -n monitoring
 helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
 
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/my_custom_metric"  | jq .
+
 
 https://github.com/infracloudio/kubernetes-autoscaling/tree/master
 

@@ -4,12 +4,21 @@ prometheus:
     serviceMonitorSelector: {}
     additionalScrapeConfigs:
       - job_name: hpademometrics
+        honor_labels: true
+        kubernetes_sd_configs:
+        - role: pod
+
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace]
+          action: replace
+          target_label: kubernetes_namespace
+        - source_labels: [__meta_kubernetes_pod_name]
+          action: replace
+          target_label: kubernetes_pod_name 
+
         scrape_interval: 15s 
         scrape_timeout: 10s 
         metrics_path: /metrics  
         scheme: http  
         static_configs:  
         - targets: ['demoapi-service:8000']
-          labels:
-            namespace: 'monitoring'
-            pod: 'my_custom_metric'
