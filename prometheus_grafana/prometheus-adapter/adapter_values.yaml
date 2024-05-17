@@ -2,13 +2,6 @@ prometheus:
   url: http://mon-kube-prometheus-stack-prometheus.monitoring.svc
   port: 9090
 logLevel: 10
-rbac:
-  create: true
-  useAuthReaderClusterRole: false
-  externalMetrics:
-    resources: ["*"]
-  customMetrics:
-    resources: ["*"]
 rules:
   default: false
   custom:
@@ -18,6 +11,6 @@ rules:
       as: "my_custom_metric"      
     resources:
       overrides:
-        job: {resource: "namespace"}
-        queue: {resource: "service"}
+        namespace: {resource: "namespace"}
+        pod: {resource: "pod"}
     metricsQuery: 'avg(request_duration_seconds_bucket{job="hpademometrics"})'
