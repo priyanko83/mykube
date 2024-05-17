@@ -9,4 +9,5 @@ prometheus:
         static_configs:  
         - targets: ['demoapi-service:8000']
           labels:
-            pod: 'my_custom_metric_pod'
+            namespace: 'project'
+            service: 'app-svc'

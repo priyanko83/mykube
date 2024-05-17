@@ -18,7 +18,6 @@ rules:
       as: "my_custom_metric"      
     resources:
       overrides:
-        namespace: {resource: "namespace"}
-        pod: {resource: "pod"}
-        job: {resource: "job"}
+        job: {resource: "namespace"}
+        queue: {resource: "service"}
     metricsQuery: 'avg(request_duration_seconds_bucket{job="hpademometrics"})'

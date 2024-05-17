@@ -105,11 +105,20 @@ helm install mon --namespace monitoring prometheus-community/kube-prometheus-sta
 helm uninstall my-prometheus-adapter -n monitoring
 helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
 
+helm uninstall mon -n monitoring
+helm install mon --namespace monitoring prometheus-community/kube-prometheus-stack --values C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-operator\prom_kube_stack_custom.yaml
+
+
+helm uninstall my-prometheus-adapter -n monitoring
+helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
 
 
 https://github.com/infracloudio/kubernetes-autoscaling/tree/master
+
 kubectl port-forward svc/mon-kube-prometheus-stack-prometheus 9090 --namespace monitoring
 kubectl port-forward svc/mon-grafana 80:80 -n monitoring
 
 admin
 prom-operator
+
+https://stackoverflow.com/questions/69617144/prometheus-adapter-empty-item-list-but-successful-http-request
