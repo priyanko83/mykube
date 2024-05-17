@@ -1,5 +1,7 @@
 prometheus:
   prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector: {}
     additionalScrapeConfigs:
       - job_name: hpademometrics
         scrape_interval: 15s 
@@ -10,4 +12,4 @@ prometheus:
         - targets: ['demoapi-service:8000']
           labels:
             namespace: 'monitoring'
-            pod: 'app'
+            pod: 'my_custom_metric'

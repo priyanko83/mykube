@@ -64,7 +64,7 @@ helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:
 
 helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
 kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1
-kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/my_custom_metric" | jq .
+ kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/*/metrics/my_custom_metric" | jq .
 
 ## Use selector to resolve pod name, view pod logs
 $POD=kubectl get pods --selector=app.kubernetes.io/instance=my-prometheus-adapter -o jsonpath='{.items[0].metadata.name}' -n monitoring 

@@ -13,4 +13,4 @@ rules:
       overrides:
         namespace: {resource: "namespace"}
         pod: {resource: "pod"}
-    metricsQuery: 'avg(request_duration_seconds_bucket{job="hpademometrics"})'
+    metricsQuery: 'request_duration_seconds_bucket'
