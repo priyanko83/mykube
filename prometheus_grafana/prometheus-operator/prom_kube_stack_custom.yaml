@@ -8,3 +8,5 @@ prometheus:
         scheme: http  
         static_configs:  
         - targets: ['demoapi-service:8000']
+          labels:
+            pod: 'my_custom_metric_pod'

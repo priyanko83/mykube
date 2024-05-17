@@ -56,7 +56,7 @@ kubectl apply -f  D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapte
 kubectl apply -k D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\Grafana\ -n monitoring
 
 kubectl get --raw "/apis/metrics.k8s.io/v1beta1" | jq.
-kubectl get --raw "/apis/metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/request_duration_seconds_avg" | jq .
+kubectl get --raw "/apis/metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/my_custom_metric" | jq .
 
 helm uninstall my-prometheus-adapter -n monitoring
 helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
@@ -100,15 +100,15 @@ wget -O - http://my-prometheus-operator-kub-prometheus.monitoring.svc:80/api/v1/
 kubectl create namespace monitoring
 helm uninstall mon -n monitoring
 helm install mon --namespace monitoring prometheus-community/kube-prometheus-stack --values D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\prom_kube_stack_custom.yaml
-kubectl --namespace monitoring get pods -l "release=mon"
 
 
 helm uninstall my-prometheus-adapter -n monitoring
-helm uninstall mon -n monitoring
+helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
+
 
 
 https://github.com/infracloudio/kubernetes-autoscaling/tree/master
-kubectl port-forward svc/my-prometheus-operator-kub-prometheus 9090 --namespace monitoring
+kubectl port-forward svc/mon-kube-prometheus-stack-prometheus 9090 --namespace monitoring
 kubectl port-forward svc/mon-grafana 80:80 -n monitoring
 
 admin
