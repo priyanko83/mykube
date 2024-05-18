@@ -1,3 +1,5 @@
+Login Commands
+================
 az login
 az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
 az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
@@ -5,75 +7,91 @@ cd D:\MyCode\eshop_reference_code\mslearn-microservices-devops-aspnet-core-main\
 kubectl apply -f nginx-controller.yaml
 
 
+Silent Commands for remote login bash to build docker
+=====================================================
 az login --service-principal -u 745395ae-a277-4b78-9d6d-afd9c4680525 -p .AdG1DRSeXcqQSBbE2dJJbg6PZsM.?7] --tenant 38857842-8570-4fcf-870b-b7aa1fcddf06
 az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
-----------------------
-cd ~
-cd /home/priyanko/MyCode/dotnet-autoscaling-code/DemoApi
-sudo docker login poc12378acr.azurecr.io --username 0cafbfb9-31b5-4c20-b40f-1ad251ee2dc7 --password T4t8Q~Y2TsB0j-YAZ3Kw2uimS56lNO_nRJc0wcXK
-
-az login --service-principal -u 745395ae-a277-4b78-9d6d-afd9c4680525 -p .AdG1DRSeXcqQSBbE2dJJbg6PZsM.?7] --tenant 38857842-8570-4fcf-870b-b7aa1fcddf06
-az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
-
 az aks get-credentials --resource-group terraform-aks-dev  --name terraform-aks-dev-cluster
 
 
 
+Docker build commands
+======================
+cd ~
+cd /home/priyanko/MyCode/dotnet-autoscaling-code/DemoApi
+sudo docker login poc12378acr.azurecr.io --username 0cafbfb9-31b5-4c20-b40f-1ad251ee2dc7 --password T4t8Q~Y2TsB0j-YAZ3Kw2uimS56lNO_nRJc0wcXK
 sudo docker build -t poc12378acr.azurecr.io/hpametrics:v1 -f Dockerfile .
 sudo docker push poc12378acr.azurecr.io/hpametrics:v1
-kubectl apply -f C:\MyCode\rootk8s\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
 
 
-kubectl delete -f C:\MyCode\rootk8s\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
-helm uninstall my-prometheus-adapter  -n monitoring
-kubectl delete -k C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-operator\ -n monitoring
 
 
-kubectl apply -k C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-operator\ -n monitoring
-helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
-kubectl apply -f C:\MyCode\rootk8s\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
+Commands for remote desktop
+============================
+kubectl create namespace monitoring
+helm uninstall mon -n monitoring
+helm install mon --namespace monitoring prometheus-community/kube-prometheus-stack --values C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-operator\prom_kube_stack_custom.yaml
 
-
-kubectl delete -k C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-operator\Grafana\ -n monitoring
-kubectl apply -k C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-operator\Grafana\ -n monitoring
 
 helm uninstall my-prometheus-adapter -n monitoring
 helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
 
+kubectl delete -f C:\MyCode\rootk8s\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
+kubectl apply -f C:\MyCode\rootk8s\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
+
+
+
+Commands for local run 
+==========================
+kubectl create namespace monitoring
+helm uninstall mon -n monitoring
+helm install mon --namespace monitoring prometheus-community/kube-prometheus-stack --values D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\prom_kube_stack_custom.yaml
+
+helm uninstall my-prometheus-adapter  -n monitoring
+helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
 
 
 kubectl delete -f D:\MyCode\kuberoot\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
-helm uninstall my-prometheus-adapter  -n monitoring
-kubectl delete -k D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\ -n monitoring
-
-kubectl delete -k D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\Grafana\ -n monitoring
-
-kubectl apply -k D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\ -n monitoring
-helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
 kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
 
-kubectl apply -f  D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\ -n monitoring
-kubectl apply -k D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\Grafana\ -n monitoring
 
 kubectl get --raw "/apis/metrics.k8s.io/v1beta1" | jq.
 kubectl get --raw "/apis/metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/my_custom_metric" | jq .
 
-helm uninstall my-prometheus-adapter -n monitoring
-helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
 
-
-helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
 kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1
- kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/*/metrics/my_custom_metric" | jq .
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/*/metrics/my_app_requests" | jq .
+
+
 
 ## Use selector to resolve pod name, view pod logs
+-----------------------------------------------------
 $POD=kubectl get pods --selector=app.kubernetes.io/instance=my-prometheus-adapter -o jsonpath='{.items[0].metadata.name}' -n monitoring 
 kubectl logs --since=6m $POD -n monitoring
 
+
+
 ## Use appname to enter pod shell
+------------------------------------
 $POD=kubectl get pods -l app=demoapi -o jsonpath='{.items[0].metadata.name}' -n monitoring 
 kubectl exec -n monitoring $POD  -it -- /bin/sh
+watch -n 5 'seq 1 10 | xargs -n1 -P10  wget  "http://demoapi-service:8000/weatherforecast" &'
 
+
+
+Launch prometheus/grafana locally
+===================================
+kubectl port-forward svc/mon-kube-prometheus-stack-prometheus 9090 --namespace monitoring
+kubectl port-forward svc/mon-grafana 80:80 -n monitoring
+
+grafana login
+-------------
+admin
+prom-operator
+
+
+Other useful stuff
+==================================
 seq 1 50 | xargs -n1 -P20  wget  "http://demoapi-service:8000/weatherforecast"
 curl http://prometheus-service.monitoring.svc:80/api/v1/series?match%5B%5D=%7B__name__%3D~%22request_duration_seconds_sum%22%7D
 curl http://mon-kube-prometheus-stack-prometheus.monitoring.svc:9090/api/v1/series?match%5B%5D=%7B__name__%3D~%22request_duration_seconds_sum%22%7D
@@ -83,44 +101,12 @@ wget -O - http://prometheus-service.monitoring.svc
 wget -O - http://prometheus-service.monitoring.svc.cluster.local
 wget -O - http://prometheus-service.monitoring.svc/api/v1/series?match[]=request_duration_seconds_sum
 
-# other useful stuff
-kubectl get pods --selector=label=app.kubernetes.io/instance=my-prometheus-adapter -n monitoring
 
 apt update
 apt install curl
 seq 1 20 | xargs -n1 -P20  curl  "http://demoapi-service:8000/weatherforecast"
 
-wget -O - http://prometheus-service.monitoring.svc:80/api/v1/series?match%5B%5D=%7B__name__%3D~%22request_duration_seconds_sum%22%7D&start=1715682195.459
-curl 
- kubectl delete apiservice v1beta1.custom.metrics.k8s.io  -n monitoring
- kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\components_latest.yaml
-
-wget -O - http://my-prometheus-operator-kub-prometheus.monitoring.svc:80/api/v1/series?match%5B%5D=%7B__name__%3D~%22request_duration_seconds_sum%22%7D
-
-kubectl create namespace monitoring
-helm uninstall mon -n monitoring
-helm install mon --namespace monitoring prometheus-community/kube-prometheus-stack --values D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\prom_kube_stack_custom.yaml
-
-
-helm uninstall my-prometheus-adapter -n monitoring
-helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
-
-helm uninstall mon -n monitoring
-helm install mon --namespace monitoring prometheus-community/kube-prometheus-stack --values C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-operator\prom_kube_stack_custom.yaml
-
-
-helm uninstall my-prometheus-adapter -n monitoring
-helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f C:\MyCode\rootk8s\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
-
-kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/my_custom_metric"  | jq .
-
-
 https://github.com/infracloudio/kubernetes-autoscaling/tree/master
 
-kubectl port-forward svc/mon-kube-prometheus-stack-prometheus 9090 --namespace monitoring
-kubectl port-forward svc/mon-grafana 80:80 -n monitoring
-
-admin
-prom-operator
-
 https://stackoverflow.com/questions/69617144/prometheus-adapter-empty-item-list-but-successful-http-request
+

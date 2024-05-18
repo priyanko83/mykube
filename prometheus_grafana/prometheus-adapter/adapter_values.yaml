@@ -13,4 +13,13 @@ rules:
       overrides:
         kubernetes_namespace: {resource: "namespace"}
         kubernetes_pod_name: {resource: "pod"}
-    metricsQuery: rate(request_duration_seconds_sum[5m]) * 1000 / rate(request_duration_seconds_count[5m])
+    metricsQuery: rate(request_duration_seconds_sum[1m]) * 1000 / rate(request_duration_seconds_count[1m])
+  - seriesQuery: 'http_requests_received_total'
+    name:
+      matches: "http_requests_received_total"
+      as: "my_app_requests"      
+    resources:
+      overrides:
+        kubernetes_namespace: {resource: "namespace"}
+        kubernetes_pod_name: {resource: "pod"}
+    metricsQuery: increase(http_requests_received_total[1m])    
