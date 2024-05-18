@@ -74,7 +74,7 @@ kubectl logs --since=6m $POD -n monitoring
 $POD=kubectl get pods -l app=demoapi -o jsonpath='{.items[0].metadata.name}' -n monitoring 
 kubectl exec -n monitoring $POD  -it -- /bin/sh
 
-seq 1 20 | xargs -n1 -P20  wget  "http://demoapi-service:8000/weatherforecast"
+seq 1 50 | xargs -n1 -P20  wget  "http://demoapi-service:8000/weatherforecast"
 curl http://prometheus-service.monitoring.svc:80/api/v1/series?match%5B%5D=%7B__name__%3D~%22request_duration_seconds_sum%22%7D
 curl http://mon-kube-prometheus-stack-prometheus.monitoring.svc:9090/api/v1/series?match%5B%5D=%7B__name__%3D~%22request_duration_seconds_sum%22%7D
 

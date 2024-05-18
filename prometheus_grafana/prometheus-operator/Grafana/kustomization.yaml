@@ -1,4 +1,0 @@
-resources:
-    - grafana-datasource-config.yaml
-    - grafana-deployment.yaml
-    - grafana-service.yaml

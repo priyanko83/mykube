@@ -13,4 +13,4 @@ rules:
       overrides:
         kubernetes_namespace: {resource: "namespace"}
         kubernetes_pod_name: {resource: "pod"}
-    metricsQuery: 'request_duration_seconds_bucket'
+    metricsQuery: rate(request_duration_seconds_sum[5m]) * 1000 / rate(request_duration_seconds_count[5m])
