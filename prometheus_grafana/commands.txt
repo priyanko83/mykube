@@ -44,21 +44,40 @@ kubectl apply -f C:\MyCode\rootk8s\mykube\prometheus_grafana\dotnet-autoscaling-
 Commands for local run 
 ==========================
 kubectl create namespace monitoring
+
+# Uninstall and then re-install prometheus operator and grafana from helmchart
+# We use 'prom_kube_stack_custom.yaml' to specify additional scraping endpoints like custom metrics endpoints
+
+VERY VERY IMPORTANT !: 
+The 'kubernetes_sd_configs' and 'relabel_configs' are key.
+They inject namespace and pod name tags with which apis/custom.metrics.k8s.io exposes custom metrics
+This is not documented anywhere in internet for exposing custom metrics !
+---------------------------------------------------------------------------------
 helm uninstall mon -n monitoring
 helm install mon --namespace monitoring prometheus-community/kube-prometheus-stack --values D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\prom_kube_stack_custom.yaml
 
+
+
+Uninstall and reinstall prometheus adapter from helm chart
+We use adapter_values.yaml to specify metrics query rules that overrides default helm chart settings
+---------------------------------------------------------------------------------------
 helm uninstall my-prometheus-adapter  -n monitoring
 helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-adapter\adapter_values.yaml -n monitoring
 
 
+
+Unnstall and reinstall custom api pod that exposes api metrics with /metrics endpoints
+----------------------------------------------------------------------------------------
 kubectl delete -f D:\MyCode\kuberoot\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
 kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
 
+Query metric 1
+----------------
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1" | jq.
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/my_custom_metric" | jq .
 
-kubectl get --raw "/apis/metrics.k8s.io/v1beta1" | jq.
-kubectl get --raw "/apis/metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/my_custom_metric" | jq .
-
-
+Query metric 2
+---------------
 kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1
 kubectl get --raw "/apis/metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/my_app_requests" | jq .
 
