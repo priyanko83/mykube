@@ -66,10 +66,17 @@ helm install my-prometheus-adapter prometheus-community/prometheus-adapter -f D:
 
 
 
-Unnstall and reinstall custom api pod that exposes api metrics with /metrics endpoints
+Unnstall and reinstall custom api pod and hpa that exposes api metrics with /metrics endpoints
 ----------------------------------------------------------------------------------------
-kubectl delete -f D:\MyCode\kuberoot\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
-kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\dotnet-autoscaling-code\DemoApi\k8sDeploy\deploytok8s.yaml -n monitoring
+kubectl delete -f D:\MyCode\kuberoot\mykube\prometheus_grafana\k8s-hpa\deploytok8s.yaml -n monitoring
+kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\k8s-hpa\deploytok8s.yaml -n monitoring
+
+Horizontal pod Autoscaler
+--------------------------
+kubectl delete -f D:\MyCode\kuberoot\mykube\prometheus_grafana\k8s-hpa\autoscale.yaml -n monitoring
+kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\k8s-hpa\autoscale.yaml -n monitoring
+
+kubectl get hpa demo-custom-metrics-hpa -n monitoring
 
 Query metric 1
 ----------------
@@ -79,7 +86,7 @@ kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/monitoring/pod
 Query metric 2
 ---------------
 kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1
-kubectl get --raw "/apis/metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/my_app_requests" | jq .
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/monitoring/pods/*/my_app_requests" | jq .
 
 
 
@@ -94,7 +101,7 @@ kubectl logs --since=6m $POD -n monitoring
 ------------------------------------
 $POD=kubectl get pods -l app=demoapi -o jsonpath='{.items[0].metadata.name}' -n monitoring 
 kubectl exec -n monitoring $POD  -it -- /bin/sh
-watch -n 5 'seq 1 10 | xargs -n1 -P10  wget  "http://demoapi-service:8000/weatherforecast" &'
+watch -n 5 'seq 1 30 | xargs -n1 -P30  wget  "http://demoapi-service:8000/weatherforecast" &'
 
 
 
@@ -107,6 +114,26 @@ grafana login
 -------------
 admin
 prom-operator
+
+Horizontal Pod Autoscaler
+============================
+https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#algorithm-details
+From the most basic perspective, the HorizontalPodAutoscaler controller operates on the ratio between
+desired metric value and current metric value:
+
+
+desiredReplicas = ceil[currentReplicas * ( currentMetricValue / desiredMetricValue )]
+
+
+For example, if the current metric value is 200m, and the desired value is 100m, the number of replicas 
+will be doubled, since 200.0 / 100.0 == 2.0 If the current value is instead 50m, you'll halve the number 
+of replicas, since 50.0 / 100.0 == 0.5. The control plane skips any scaling action if the ratio is 
+sufficiently close to 1.0 (within a globally-configurable tolerance, 0.1 by default).
+When a targetAverageValue or targetAverageUtilization is specified, the currentMetricValue is computed by 
+taking the average of the given metric across all Pods in the HorizontalPodAutoscaler's scale target.
+
+
+
 
 
 Other useful stuff
@@ -128,4 +155,5 @@ seq 1 20 | xargs -n1 -P20  curl  "http://demoapi-service:8000/weatherforecast"
 https://github.com/infracloudio/kubernetes-autoscaling/tree/master
 
 https://stackoverflow.com/questions/69617144/prometheus-adapter-empty-item-list-but-successful-http-request
+
 

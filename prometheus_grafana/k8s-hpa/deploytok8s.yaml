@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demoapi-deployment
+  labels:
+    app: demoapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demoapi
+  template:
+    metadata:
+      labels:
+        app: demoapi
+    spec:
+      containers:
+        - name: demoapi
+          image: poc12378acr.azurecr.io/hpametrics:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Development
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demoapi-service
+spec:
+  type: ClusterIP
+  selector:
+    app: demoapi
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 80      
