@@ -132,7 +132,10 @@ sufficiently close to 1.0 (within a globally-configurable tolerance, 0.1 by defa
 When a targetAverageValue or targetAverageUtilization is specified, the currentMetricValue is computed by 
 taking the average of the given metric across all Pods in the HorizontalPodAutoscaler's scale target.
 
-
+Scaleup Scaledown behavior
+--------------------------
+Go through below user stories on hpa scaleup scale down behaviorr, super helpful
+https://github.com/kubernetes/enhancements/blob/master/keps/sig-autoscaling/853-configurable-hpa-scale-velocity/README.md#user-stories
 
 
 

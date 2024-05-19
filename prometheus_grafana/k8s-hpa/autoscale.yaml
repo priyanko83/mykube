@@ -19,6 +19,7 @@ spec:
         type: AverageValue
         averageValue: 20
   behavior:
+    #https://github.com/kubernetes/enhancements/blob/master/keps/sig-autoscaling/853-configurable-hpa-scale-velocity/README.md#user-stories
     scaleDown:
       stabilizationWindowSeconds: 60
       policies:
