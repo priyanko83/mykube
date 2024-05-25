@@ -1,0 +1,39 @@
+# https://www.gokhan-gokalp.com/en/working-with-persistent-volumes-by-using-azure-files-in-azure-kubernetes-service/
+# PersistentVolume is a Kubernetes storage resource that has its own lifecycle independent of any pod unlike a normal volume. PersistentVolumeClaim is used to mount PersistentVolume to a pod.
+
+# In short, when an application needs a persistent storage, the relevant domain user can request a storage for their own application by using PersistentVolumeClaim without having detailed information about the storage.
+
+# First, Kubernetes needs the credential information of the File shares to access it. For this, let’s create a secret object named “pv-pvc-demo-secret” in Kubernetes cluster that will contain credential information of the storage as follows.
+
+kubectl create namespace pv-pvc-demo
+$STORAGE_KEY=$(az storage account keys list --resource-group storage --account-name priyankoazure --query "[0].value" -o tsv)
+
+kubectl create secret generic pv-pvc-demo-secret --from-literal=azurestorageaccountname=priyankoazure --from-literal=azurestorageaccountkey=$STORAGE_KEY -n pv-pvc-demo
+kubectl delete secret generic pv-pvc-demo-secret -n pv-pvc-demo
+
+
+kubectl apply -f D:\MyCode\kuberoot\mykube\aks-pv-pvc-demo\existing-file-share -n pv-pvc-demo
+
+$POD=kubectl get pods -l app=mypvcdemoapp -o jsonpath='{.items[0].metadata.name}' -n pv-pvc-demo 
+kubectl exec -n pv-pvc-demo $POD  -it -- /bin/sh
+
+
+##  Useful Note  ##
+========================================
+Let’s take a look at what we have done here.
+
+
+We have defined that the PersistentVolume has a capacity of 5Gi.
+We set the “accessModes” option to “ReadWriteMany“. Thus, this PersistentVolume can be mounted by more than one node as read-write.
+
+
+If we wanted to have storage account to be created dynamically by the Kubernetes rather than statically, instead of the PersistentVolume resource we would have to create a StorageClass resource with the criteria we want and create a PersistentVolumeClaim that will use that resource.
+
+
+Since we will use the Azure Files service as the storage plugin, we have pointed as a reference the “shareName” and “secretName” information of the File shares service we created.
+
+We also set the “persistentVolumeReclaimPolicy” option to “Retain“. Thus, when the PersistentVolumeClaim gets deleted, the PersistentVolume will not be deleted along with the related data.
+
+In short, we are going to create a storage resource with a capacity of 5Gi in the cluster with PersistentVolume.
+
+As a developer, we will use the PersistentVolumeClaim to request a persistent storage with 5Gi capacity by referencing it in a pod spec that we want. In addition, by setting the “storageClassName” attribute to empty, we have ensured that the storage is not created dynamically.
