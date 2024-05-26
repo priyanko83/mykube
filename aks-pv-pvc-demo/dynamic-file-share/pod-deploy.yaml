@@ -2,10 +2,12 @@ kind: Pod
 apiVersion: v1
 metadata:
   name: nginx
+  labels:
+    app: dynamicpvcsharedemoapp  
 spec:
   containers:
-  - name: dynamicfilesharepod
-    image: mcr.microsoft.com/oss/nginx/nginx:1.15.5-alpine
+  - image: mcr.microsoft.com/oss/nginx/nginx:1.15.5-alpine    
+    name: dynamic-fileshare-pod
     resources:
       requests:
         cpu: 100m
@@ -15,8 +17,8 @@ spec:
         memory: 256Mi
     volumeMounts:
     - mountPath: "/mnt/azure"
-      name: volume
+      name: dynamicvolume
   volumes:
-    - name: volume
+    - name: dynamicvolume
       persistentVolumeClaim:
         claimName: my-dynamic-pvc-fileshare

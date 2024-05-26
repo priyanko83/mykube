@@ -2,23 +2,22 @@
 
 kubectl create namespace pv-pvc-demo
 
-kubectl apply -f D:\MyCode\kuberoot\mykube\aks-pv-pvc-demo\dynamic-file-share\storage-class.yaml
-kubectl get sc
-
-kubectl apply -f D:\MyCode\kuberoot\mykube\aks-pv-pvc-demo\dynamic-file-share\fileshare_pvc.yaml
-kubectl get pvc
-
-# Now navigate to Storage account in default resource group created by kubernetes cluster(Starts with MC_). Go to the storage account automatically created and click on file share as shown below.
-# Here you will notice a file share is dynamically created.
-# Now to access this file share my cluster needs to have credentials to connect to it. You can find this credentials Access Keys on the left hand side. Kubernetes stores same set of access keys in secrets the moment it creates the file share. Hit the following command to get the access keys from secrets.
 
 kubectl get secrets
 kubectl get secret <secrete_name_from_above_command> -o yaml
 
 # Now lets deploy the pod which will make use of this file share using this secrets.
-kubectl apply -f fileshare_pod_deployment.yaml -n pv-pvc-demo
+kubectl apply -f D:\MyCode\kuberoot\mykube\aks-pv-pvc-demo\dynamic-file-share -n pv-pvc-demo
 
 # To confirm whether we are able to access the file share from within the pod lets shell into the pod with following command and create a file: After executing this command hop on to azure portal and you will notice the file with same content in file share.
 
-kubectl exec pod/nginx -it -- /bin/sh
-> / # echo this is demo for file share as persistence volume. Thanks !!! > /mnt/azure/file.txt
+$POD=kubectl get pods -l app=dynamicpvcsharedemoapp -o jsonpath='{.items[0].metadata.name}' -n pv-pvc-demo 
+kubectl exec -n pv-pvc-demo $POD  -it -- /bin/sh
+echo "insert text here" > /mnt/azure/myfile.txt
+
+# Now navigate to Storage account in default resource group created by kubernetes cluster(Starts with MC_). Go to the storage account automatically created and click on file share as shown below.
+# Here you will notice a file share is dynamically created.
+# Now to access this file share my cluster needs to have credentials to connect to it. You can find this credentials Access Keys on the left hand side. Kubernetes stores same set of access keys in secrets the moment it creates the file share. Hit the following command to get the access keys from secrets.
+
+
+#Navigate to Resource group terraform-aks-dev-nrg. Then watchout for storage account with name similar to f6a7ca1762df14f2d8c1394 (as its a dynamic file share). Then open the file storage, you will see the file myfile.txt present. 
