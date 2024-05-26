@@ -53,6 +53,10 @@ The 'kubernetes_sd_configs' and 'relabel_configs' are key.
 They inject namespace and pod name tags with which apis/custom.metrics.k8s.io exposes custom metrics
 This is not documented anywhere in internet for exposing custom metrics !
 ---------------------------------------------------------------------------------
+
+# this is one time activity, no need to run it every time you decidde to uninstall/install prometheus stack
+kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\storage-class.yaml -n monitoring
+
 helm uninstall mon -n monitoring
 helm install mon --namespace monitoring prometheus-community/kube-prometheus-stack --values D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\prom_kube_stack_custom.yaml
 
