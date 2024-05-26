@@ -1,14 +1,16 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: demopv-prom
+  name: pv-monitoring
+  labels:
+    volumeIdentifier: prometheus-server-monitoring  
 spec:
   capacity:
     storage: 5Gi
   accessModes:
     - ReadWriteMany
   azureFile:
-    secretName: pv-pvc-demo-secret
+    secretName: pv-pvc-secret-monitoring
     shareName: pv-pvc-demo
     readOnly: false
   persistentVolumeReclaimPolicy: Retain

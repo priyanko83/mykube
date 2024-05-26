@@ -54,12 +54,23 @@ They inject namespace and pod name tags with which apis/custom.metrics.k8s.io ex
 This is not documented anywhere in internet for exposing custom metrics !
 ---------------------------------------------------------------------------------
 
-# this is one time activity, no need to run it every time you decidde to uninstall/install prometheus stack
-kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\storage-class.yaml -n monitoring
+# this is one time activity for pv/pvc setup, no need to run it every time 
+# you decidde to uninstall/install prometheus stack
+--------------------------------------------------------------------------------
+kubectl delete secret generic pv-pvc-secret-monitoring -n monitoring
+$STORAGE_KEY=$(az storage account keys list --resource-group storage --account-name priyankoazure --query "[0].value" -o tsv)
+kubectl create secret generic pv-pvc-secret-monitoring --from-literal=azurestorageaccountname=priyankoazure --from-literal=azurestorageaccountkey=$STORAGE_KEY -n monitoring -o yaml
 
+kubectl delete -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\pv-pvc -n monitoring
+kubectl apply -f D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\pv-pvc -n monitoring
+
+
+below activity can be performed n times
+-------------------------------------
 helm uninstall mon -n monitoring
-helm install mon --namespace monitoring prometheus-community/kube-prometheus-stack --values D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\prom_kube_stack_custom.yaml
+helm install mon --namespace monitoring prometheus-community/kube-prometheus-stack --values D:\MyCode\kuberoot\mykube\prometheus_grafana\prometheus-operator\prom_kube_stack_custom.yaml 
 
+#Ref: https://blog.devops.dev/deploying-kube-prometheus-stack-with-persistent-storage-on-kubernetes-cluster-24473f4ea34f
 
 
 Uninstall and reinstall prometheus adapter from helm chart

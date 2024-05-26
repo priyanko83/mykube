@@ -1,13 +1,16 @@
 prometheus:
   prometheusSpec:    
     storageSpec: 
-     volumeClaimTemplate:
-       spec:
-         storageClassName: custom-storage-class-for-prometheus
+      volumeClaimTemplate:
+        spec:
+         storageClassName: ""
          accessModes: ["ReadWriteMany"]
          resources:
            requests:
-             storage: 2Gi  
+             storage: 2Gi
+         selector:
+          matchLabels:
+            volumeIdentifier: prometheus-server-monitoring             
     serviceMonitorSelectorNilUsesHelmValues: false
     serviceMonitorSelector: {}
     additionalScrapeConfigs:
