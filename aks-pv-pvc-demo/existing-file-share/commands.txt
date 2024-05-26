@@ -8,7 +8,7 @@
 kubectl create namespace pv-pvc-demo
 $STORAGE_KEY=$(az storage account keys list --resource-group storage --account-name priyankoazure --query "[0].value" -o tsv)
 
-kubectl create secret generic pv-pvc-demo-secret --from-literal=azurestorageaccountname=priyankoazure --from-literal=azurestorageaccountkey=$STORAGE_KEY -n pv-pvc-demo
+kubectl create secret generic pv-pvc-demo-secret --from-literal=azurestorageaccountname=priyankoazure --from-literal=azurestorageaccountkey=$STORAGE_KEY -n pv-pvc-demo -o yaml
 kubectl delete secret generic pv-pvc-demo-secret -n pv-pvc-demo
 
 
@@ -17,6 +17,7 @@ kubectl apply -f D:\MyCode\kuberoot\mykube\aks-pv-pvc-demo\existing-file-share -
 $POD=kubectl get pods -l app=mypvcdemoapp -o jsonpath='{.items[0].metadata.name}' -n pv-pvc-demo 
 kubectl exec -n pv-pvc-demo $POD  -it -- /bin/sh
 
+echo "insert text here" > /mnt/azure/myfile.txt
 
 ##  Useful Note  ##
 ========================================
