@@ -6,8 +6,8 @@ prometheus:
          storageClassName: ""
          accessModes: ["ReadWriteMany"]
          resources:
-           requests:
-             storage: 2Gi
+          requests:
+            storage: 2Gi
          selector:
           matchLabels:
             volumeIdentifier: prometheus-server-monitoring             
