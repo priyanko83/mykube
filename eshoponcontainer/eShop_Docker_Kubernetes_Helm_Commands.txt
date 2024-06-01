@@ -1,0 +1,116 @@
+az login
+az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
+az aks get-credentials --resource-group eshop-aks  --name eshop-aks-cluster
+az aks browse --resource-group eshop-aks  --name eshop-aks-cluster
+
+az login
+az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
+az aks get-credentials --resource-group eshop-aks  --name eshop-aks-cluster
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+cd C:\eShop\deploy\k8s\helm
+C:\eShop\deploy\k8s\helm\deploy-all.ps1 -externalDns aks -aksName eshop-aks-cluster -aksRg eshop-aks -useMesh $false
+
+az login --service-principal -u 745395ae-a277-4b78-9d6d-afd9c4680525 -p .AdG1DRSeXcqQSBbE2dJJbg6PZsM.?7] --tenant 38857842-8570-4fcf-870b-b7aa1fcddf06
+az account set --subscription 87942bd2-87e0-47f3-a71f-f6817369c2ec
+
+
+For remote ubuntu build
+------------------------
+sudo docker system prune  # for removing all stopped containers, all networks not used by at least one container, all dangling images, all build cache
+sudo docker rmi $(docker images -f "dangling=true" -q)
+sudo docker login --username=priyanko83
+
+cd ~
+cd ./eShop/src
+sudo docker build -t priyanko83/identity.api:latest -f Services/Identity/Identity.API/Dockerfile .
+sudo docker push priyanko83/identity.api:latest
+
+sudo docker build -t priyanko83/basket.api:latest -f Services/Basket/Basket.API/Dockerfile .
+sudo docker push priyanko83/basket.api:latest
+
+sudo docker build -t priyanko83/ordering.api:latest -f Services/Ordering/Ordering.API/Dockerfile .
+sudo docker push priyanko83/ordering.api:latest
+
+sudo docker build -t priyanko83/basket.api:latest -f Services/Basket/Basket.API/Dockerfile .
+sudo docker push priyanko83/basket.api:latest
+
+sudo docker build -t priyanko83/catalog.api:latest -f Services/Catalog/Catalog.API/Dockerfile .
+sudo docker push priyanko83/catalog.api:latest
+
+sudo docker build -t priyanko83/ordering.backgroundtasks:latest -f Services/Ordering/Ordering.BackgroundTasks/Dockerfile .
+sudo docker push priyanko83/ordering.backgroundtasks:latest
+
+sudo docker build -t priyanko83/ordering.signalrhub:latest -f Services/Ordering/Ordering.SignalrHub/Dockerfile .
+sudo docker push priyanko83/ordering.signalrhub:latest
+
+sudo docker build -t priyanko83/locations.api:latest -f Services/Location/Locations.API/Dockerfile .
+sudo docker push priyanko83/locations.api:latest
+
+sudo docker build -t priyanko83/marketing.api:latest -f Services/Marketing/Marketing.API/Dockerfile .
+sudo docker push priyanko83/marketing.api:latest
+
+sudo docker build -t priyanko83/payment.api:latest -f Services/Payment/Payment.API/Dockerfile .
+sudo docker push priyanko83/payment.api:latest
+
+sudo docker build -t priyanko83/webhooks.api:latest -f Services/Webhooks/Webhooks.API/Dockerfile .
+sudo docker push priyanko83/webhooks.api:latest
+
+sudo docker build -t priyanko83/webhooks.client:latest -f Web/WebhookClient/Dockerfile .
+sudo docker push priyanko83/webhooks.client:latest
+
+sudo docker build -t priyanko83/webstatus:latest -f Web/WebStatus/Dockerfile .
+sudo docker push priyanko83/webstatus:latest
+
+sudo docker build -t priyanko83/webmvc:latest -f Web/WebMVC/Dockerfile .
+sudo docker push priyanko83/webmvc:latest
+
+sudo docker build -t priyanko83/webshoppingagg:latest -f ApiGateways/Web.Bff.Shopping/aggregator/Dockerfile .
+sudo docker push priyanko83/webshoppingagg:latest
+
+sudo docker build -t priyanko83/webshoppingagg:latest -f ApiGateways/Mobile.Bff.Shopping/aggregator/Dockerfile .
+sudo docker push priyanko83/mobileshoppingagg:latest
+
+
+sudo docker build -f Services/Ordering/Ordering.API/Dockerfile .
+sudo docker tag 1604 priyanko83/ordering.api:latest
+sudo docker push priyanko83/ordering.api:latest
+
+#The run command arguments:
+==============================
+#Allocate a pseudo-TTY and keep it open even if not attached. (Same effect as --interactive --tty.)
+#Automatically remove the container when it exits.
+#Map port 5000 on the local machine to port 80 in the container.
+#Name the container aspnetcore_sample.
+#Specify the aspnetapp image.
+sudo docker run -it --rm -p 5000:80 --name basketapi priyanko83/basket.api:latest
+
+
+#Go to http://localhost:5000 in a browser to test the app.
+curl localhost:5000
+
+# One time activities
+# =======================
+# To install helm client in local desktop, first install chocolatey through powershell
+# From chocolatey, install helm client  again through powershell
+# Then use this article to install helm repo, update repo, create service account etc
+# https://docs.microsoft.com/en-us/azure/aks/kubernetes-helm
+# INSTALL SERVICE ACCOUNT
+kubectl apply -f C:\eShopOnContainers-dev\helm-rbac.yaml
+
+#navigate to C:\eShopOnContainers-dev\deploy\k8s
+cd C:\eShopOnContainers-dev\deploy\k8s
+.\deploy-all.ps1 -externalDns aks -aksName eshoptest -aksRg eshoptest -imageTag dev -useMesh $false
+kubectl create clusterrolebinding kubernetes-dashboard -n kube-system --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
+
+$ docker volume prune
+
+
+#Deploy Azure Service Bus
+#============================
+# go to `deploy\az` folder and type
+cd C:\eShop\deploy\azure\az
+create-resources.cmd servicebus\sbusdeploy newResourceGroup -c centralus
+
+Update:10/27/2020 - Google Chrome Issue
+============================================
+https://github.com/dotnet-architecture/eShopOnContainers/wiki/Frequent-errors#login-page---exception-correlation-failed
