@@ -4,16 +4,25 @@
 
 3. Ordering.API Has subscription to type UserCheckoutAcceptedIntegrationEvent. It intercepts the event.
 a) It calls UserCheckoutAcceptedIntegrationEventHandler.Handle() function 
-b) The Handle function in Ordering.API project calls CreateOrderCommand object and sends it to _mediator.Send(). It performs two things
+b) The Handle function in Ordering.API project creates "CreateOrderCommand" object and sends it to _mediator.Send(). 
 
-	1) _mediator.Send() invokes OrderApi-CreateOrderCommandHandler-Handle
+	 _mediator.Send() then invokes OrderApi-CreateOrderCommandHandler-Handle method as "CreateOrderCommandHandler" implements mediatR.IRequestHandler<CreateOrderCommand, bool>
 		i) This in turn calls _orderingIntegrationEventService.AddAndSaveEventAsync(OrderStartedIntegrationEvent);
-		ii) This publishes event OrderStartedIntegrationEvent to service bus
-
-	2) _mediator.Send() invokes  ValidateOrAddBuyerAggregateWhenOrderStartedDomainEventHandler-Handle. 
-		i) This in turn calls _orderingIntegrationEventService.AddAndSaveEventAsync(orderStatusChangedTosubmittedIntegrationEvent);
-		ii) This publishes event OrderStatusChangedTosubmittedIntegrationEvent to service bus
-
+			1) this calls IntegrationEventLogService.SaveEventAsync
+			2) this in turn calls _integrationEventLogContext.SaveChangesAsync();
+			3) TransactionBehaviour.Handle method gets invoked (as contect is performing transaction & transcationbehavior implements mediatR.pipeline
+			4) 
+		ii) This publishes event OrderStartedIntegrationEvent to service bus using _orderingIntegrationEventService.PublishEventsThroughEventBusAsync(transactionId); method
+		iii) OrderApi-CreateOrderCommandHandler-Handle then creates "Order" aggregate and adds order items.
+		iv) "Order" aggregate constructor calls "AddOrderStartedDomainEvent"
+                v) "OrderApi-CreateOrderCommandHandler-Handle" then adds order aggregate to order repository by calling _orderRepository.Add(order);
+		vi) This in turn calls _orderRepository.UnitOfWork.SaveEntitiesAsync .  UnitOfWork is IUnitOfWork object.
+		vii)  OrderingContext implements IUnitOfWork. So, _orderRepository.UnitOfWork.SaveEntitiesAsync in turn calls OrderingContext.SaveEntitiesAsync
+		viii) OrderingContext.SaveEntitiesAsync then calls _mediator.DispatchDomainEventsAsync
+		ix) DispatchDomainEventsAsync collects all domain events for order aggregate ("AddOrderStartedDomainEvent" that was added in step iv above). 
+			1. It then publishes "AddOrderStartedDomainEvent" event using mediator.publish. 
+			2. mediator.publush then invokes  "ValidateOrAddBuyerAggregateWhenOrderStartedDomainEventHandler.Handle" method
+			3. This happens since "ValidateOrAddBuyerAggregateWhenOrderStartedDomainEventHandler" implements mediatR.INotificationHandler<OrderStartedDomainEvent>
 
 
 4. Basket.API Has subscription to type OrderStartedIntegrationEvent. It intercepts the event.
