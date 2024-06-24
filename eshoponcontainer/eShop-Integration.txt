@@ -1,3 +1,5 @@
+Orchestrator - Saga Pattern (Order service being orchestrator here)
+=====================================================================
 1. User Action - Place Order - UI
 
 2. Basket.API.BasketController.CheckoutAsync is called.  It creates a UserCheckoutAcceptedIntegrationEvent object and sends to service bus topic.
