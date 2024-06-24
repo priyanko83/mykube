@@ -10,30 +10,33 @@ b) The Handle function in Ordering.API project creates "CreateOrderCommand" obje
 		i) This in turn calls _orderingIntegrationEventService.AddAndSaveEventAsync(OrderStartedIntegrationEvent);
 			1) this calls IntegrationEventLogService.SaveEventAsync
 			2) this in turn calls _integrationEventLogContext.SaveChangesAsync();
-			3) TransactionBehaviour.Handle method gets invoked (as contect is performing transaction & transcationbehavior implements mediatR.pipeline
-			4) 
-		ii) This publishes event OrderStartedIntegrationEvent to service bus using _orderingIntegrationEventService.PublishEventsThroughEventBusAsync(transactionId); method
-		iii) OrderApi-CreateOrderCommandHandler-Handle then creates "Order" aggregate and adds order items.
-		iv) "Order" aggregate constructor calls "AddOrderStartedDomainEvent"
-                v) "OrderApi-CreateOrderCommandHandler-Handle" then adds order aggregate to order repository by calling _orderRepository.Add(order);
-		vi) This in turn calls _orderRepository.UnitOfWork.SaveEntitiesAsync .  UnitOfWork is IUnitOfWork object.
-		vii)  OrderingContext implements IUnitOfWork. So, _orderRepository.UnitOfWork.SaveEntitiesAsync in turn calls OrderingContext.SaveEntitiesAsync
-		viii) OrderingContext.SaveEntitiesAsync then calls _mediator.DispatchDomainEventsAsync
-		ix) DispatchDomainEventsAsync collects all domain events for order aggregate ("AddOrderStartedDomainEvent" that was added in step iv above). 
+			3) TransactionBehaviour.Handle method gets invoked (as orderingcontext i.e. dbcontext is performing transaction & transcationbehavior implements mediatR.pipeline)
+	
+		ii) TransactionBehaviour.Handle method then publishes event OrderStartedIntegrationEvent to service bus using method _orderingIntegrationEventService.PublishEventsThroughEventBusAsync(transactionId); 
+		iii) Basket.API Has subscription to type "OrderStartedIntegrationEvent". It intercepts the event.
+			a) Basket Api - OrderStartedIntegrationEventHandler - Performs DeleteBasketAsync
+
+		iv) OrderApi-CreateOrderCommandHandler-Handle (step i above) then creates "Order" aggregate and adds order items.
+		v) "Order" aggregate constructor calls "AddOrderStartedDomainEvent"
+                vi) "OrderApi-CreateOrderCommandHandler-Handle" then adds order aggregate to order repository by calling _orderRepository.Add(order);
+		vii) This in turn calls _orderRepository.UnitOfWork.SaveEntitiesAsync .  UnitOfWork is IUnitOfWork object.
+		viii)  OrderingContext implements IUnitOfWork. So, _orderRepository.UnitOfWork.SaveEntitiesAsync in turn calls OrderingContext.SaveEntitiesAsync
+		ix) OrderingContext.SaveEntitiesAsync then calls _mediator.DispatchDomainEventsAsync
+		x) DispatchDomainEventsAsync collects all domain events for order aggregate ("AddOrderStartedDomainEvent" that was added in step iv above). 
 			1. It then publishes "AddOrderStartedDomainEvent" event using mediator.publish. 
 			2. mediator.publush then invokes  "ValidateOrAddBuyerAggregateWhenOrderStartedDomainEventHandler.Handle" method
 			3. This happens since "ValidateOrAddBuyerAggregateWhenOrderStartedDomainEventHandler" implements mediatR.INotificationHandler<OrderStartedDomainEvent>
+			4. This validate....Handle() method creates a buyer aggregate if not present and then adds "BuyerAndPaymentMethodVerifiedDomainEvent"
+			5. This validate....Handle() method then creates or updates the buyer aggregate in repository. This updates orderingcontext i.e. dbcontext
+			6. It then publishes "OrderStatusChangedToSubmittedIntegrationEvent" to servicebus using "AddAndSaveEventAsync" method flow as described in step 3b-i) above.
+			7. Ordering.SignalRHub has subscription to type OrderStatusChangedToSubmittedIntegrationEvent. It only notifies the Frontend of the submitted status.
 
 
-4. Basket.API Has subscription to type OrderStartedIntegrationEvent. It intercepts the event.
-a) Basket Api - OrderStartedIntegrationEventHandler - Performs DeleteBasketAsync 
-
-5. Ordering.SignalRHub has subscription to type OrderStatusChangedToSubmittedIntegrationEvent. It only notifies the Frontend of the submitted status.
-
-6. Ordering.BackgroundTasks runs periodically and pulls in the newly placed order id. 
+4. Ordering.BackgroundTasks runs periodically and pulls in the newly placed order id. 
 a) It creates GracePeriodConfirmedIntegrationEvent and publishes to service bus topic
 
-7. Ordering.API Has subscription to type GracePeriodConfirmedIntegrationEvent. It intercepts the event.
+
+5. Ordering.API Has subscription to type GracePeriodConfirmedIntegrationEvent. It intercepts the event.
 a) It calls GracePeriodConfirmedIntegrationEventHandler.Handle() event
 b) It creates SetAwaitingValidationOrderStatusCommand  object and sends it to _mediator.Send()
 c) _mediator.Send() invokes OrderApi-SetAwaitingValidationOrderStatusCommandHandler-Handle() operation
@@ -41,16 +44,16 @@ d) OrderApi-OrderingIntegrationEventService-AddAndSaveEventAsync  is called.
 e) OrderApi-OrderingIntegrationEventService-PublishEventsThroughEventBusAsync  is called. This publishes OrderStatusChangedToAwaitingValidationIntegrationEvent to service bus topic
  
 
-8. Ordering.SignalRHub has subscription to type OrderStatusChangedToAwaitingValidationIntegrationEvent. It only notifies the Frontend of the submitted status.
+6. Ordering.SignalRHub has subscription to type OrderStatusChangedToAwaitingValidationIntegrationEvent. It only notifies the Frontend of the submitted status.
 
 
-9. Catalog.API Has subscription to type OrderStatusChangedToAwaitingValidationIntegrationEvent. It intercepts the event.
+7. Catalog.API Has subscription to type OrderStatusChangedToAwaitingValidationIntegrationEvent. It intercepts the event.
 a) It calls OrderStatusChangedToAwaitingValidationIntegrationEvent.Handle() event
 b) It creates OrderStockConfirmedIntegrationEvent or OrderStockRejectedIntegrationEvent object 
 c) It publishes the event to service bus
 
 
-10. Ordering.API has subscriptions to OrderStockConfirmedIntegrationEvent. It intercepts the event.
+8. Ordering.API has subscriptions to OrderStockConfirmedIntegrationEvent. It intercepts the event.
 a) Invokes OrderStockConfirmedIntegrationEventHandler.handle(). 
 b) It creates SetStockConfirmedOrderStatusCommand  object and sends it to _mediator.Send()
 c) _mediator.Send() invokes OrderApi-SetStockConfirmedOrderStatusCommandHandler-Handle() operation
@@ -60,12 +63,12 @@ f) Same flow is applicable for OrderStockRejectedIntegrationEvent
 
 
 
-11. Ordering.SignalRHub has subscription to type OrderStatusChangedToStockConfirmedIntegrationEvent. It only notifies the Frontend of the submitted status.
+9. Ordering.SignalRHub has subscription to type OrderStatusChangedToStockConfirmedIntegrationEvent. It only notifies the Frontend of the submitted status.
 
 
 
 
-12. Payment.API Has subscription to type OrderStatusChangedToStockConfirmedIntegrationEvent. It intercepts the event.
+10. Payment.API Has subscription to type OrderStatusChangedToStockConfirmedIntegrationEvent. It intercepts the event.
 a) It calls OrderStatusChangedToStockConfirmedIntegrationEvent.Handle() event
 b) It either creates OrderPaymentSucceededIntegrationEvent object or OrderPaymentFailedIntegrationEvent object and then publishes the event to servicebus.
 service bus.
@@ -74,7 +77,7 @@ service bus.
 
 
 
-13. Ordering.API Has subscription to type OrderPaymentSucceededIntegrationEvent. It intercepts the event.
+11. Ordering.API Has subscription to type OrderPaymentSucceededIntegrationEvent. It intercepts the event.
 a) It calls OrderPaymentSucceededIntegrationEventHandler.Handle() event
 b) It creates SetPaidOrderStatusCommand  object and sends it to _mediator.Send()
 c) _mediator.Send() invokes OrderApi-SetPaidOrderStatusCommandHandler-Handle() operation
@@ -84,12 +87,12 @@ e) OrderApi-OrderingIntegrationEventService-PublishEventsThroughEventBusAsync  i
 
 
 
-14. Ordering.SignalRHub has subscription to type OrderStatusChangedToPaidIntegrationEvent. It only notifies the Frontend of the submitted status.
+12. Ordering.SignalRHub has subscription to type OrderStatusChangedToPaidIntegrationEvent. It only notifies the Frontend of the submitted status.
 
 
 
 
-15. Webhooks.API  has subscription to type OrderStatusChangedToPaidIntegrationEvent. It intercepts the event.
+13. Webhooks.API  has subscription to type OrderStatusChangedToPaidIntegrationEvent. It intercepts the event.
 a) It calls OrderStatusChangedToPaidIntegrationEventHandler.Handle() event
 b) Which in turn calls IWebhooksSender.SendAll()
 c) I have no idea what IWebhooksSender.SendAll() does. Figure it out!!!
