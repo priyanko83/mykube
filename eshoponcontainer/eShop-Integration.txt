@@ -42,14 +42,17 @@ a) It creates GracePeriodConfirmedIntegrationEvent and publishes to service bus 
 a) It calls GracePeriodConfirmedIntegrationEventHandler.Handle() event
 b) It creates SetAwaitingValidationOrderStatusCommand  object and sends it to _mediator.Send()
 c) _mediator.Send() invokes OrderApi-SetAwaitingValidationOrderStatusCommandHandler-Handle() operation
-d) OrderApi-OrderingIntegrationEventService-AddAndSaveEventAsync  is called.
-e) OrderApi-OrderingIntegrationEventService-PublishEventsThroughEventBusAsync  is called. This publishes OrderStatusChangedToAwaitingValidationIntegrationEvent to service bus topic
+d) It  fetches order aggregate from order repository (SQL DB). Then creates a domain event "OrderStatusChangedToAwaitingStockValidationDomainEvent"
+e) Then it first calls _mediator.DispatchDomainEventsAsync; and then saves order back to repository. 
+f) _mediator.DispatchDomainEventsAsync calls "OrderStatusChangedToAwaitingStockValidationDomainEventHandler.Handle()"
+g) OrderStatusChangedToAwaitingStockValidationDomainEventHandler.Handle() publishes "OrderStatusChangedToAwaitingStockValidationIntegrationEvent" to service bus through _orderingIntegrationEventService.AddAndSaveEventAsync
+h) 
  
 
-6. Ordering.SignalRHub has subscription to type OrderStatusChangedToAwaitingValidationIntegrationEvent. It only notifies the Frontend of the submitted status.
+6. Ordering.SignalRHub has subscription to type OrderStatusChangedToAwaitingStockValidationIntegrationEvent. It only notifies the Frontend of the submitted status.
 
 
-7. Catalog.API Has subscription to type OrderStatusChangedToAwaitingValidationIntegrationEvent. It intercepts the event.
+7. Catalog.API Has subscription to type OrderStatusChangedToAwaitingStockValidationIntegrationEvent. It intercepts the event.
 a) It calls OrderStatusChangedToAwaitingValidationIntegrationEvent.Handle() event
 b) It creates OrderStockConfirmedIntegrationEvent or OrderStockRejectedIntegrationEvent object 
 c) It publishes the event to service bus
